@@ -1,0 +1,105 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Source Code Pro', monospace;
+}
+
+#left-side {
+  width: 66%;
+  display: inline-block;
+}
+
+#sketch-holder {}
+
+#swatch-holder {
+  width: 80%;
+  display: flex;
+  margin-right: auto;
+}
+
+.swatch {
+  display: inline-block;
+  margin-right: 15px;
+  background-color: lightgrey;
+  width: 12%;
+  padding-top: 12%;
+  outline-offset: -1px;
+  cursor: pointer;
+}
+
+#sketch-border {
+  padding: 20px;
+  background-color: black;
+}
+
+#right-side {
+  display: inline-block;
+  position: relative;
+  float: right;
+  width: 34%;
+}
+
+#preview-image {
+  position: absolute;
+  top: 34.5%;
+  right: 45.5%;
+  width: 12.5%;
+  padding-top: 13.25%;
+  background-size: 100% 100%;
+  background-color: black;
+  z-index: 2;
+}
+
+#sock-image {
+  width: 108%;
+  position: relative;
+  margin-top: 8%;
+}
+
+#control-holder {
+  display: flex;
+  width: 100%;
+}
+
+.control {
+  /* background-color: red; */
+  padding: 10px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+#brush-size-holder {
+  position: relative;
+  display: flex;
+}
+
+#clear-button {
+  margin: auto;
+}
+
+#bottom-row {
+  display: flex;
+  margin-top: 15px;
+}
+
+.brush-size {
+  /* background-color: red; */
+  font-size: 35px;
+  display: flex;
+  padding: 0 10 0 10;
+  /* margin-left: 10px; */
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  cursor: pointer;
+}
+
+@media only screen and (max-width: 600px) {
+  #left-side {
+    width: 100%;
+    display: inline-block;
+  }
+  #right-side {
+    display: none;
+  }
+}
