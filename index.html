@@ -10,35 +10,50 @@
 </head>
 
 <body>
-  <div id="left-side">
-    <div id='control-holder'>
-      <div id="undo-button" class='control'>↩️ Undo</div>
-      <div id="clear-button" class='control'>❌ Clear</div>
-      <div id="save-button" class='control'>💾Save</div>
-    </div>
-    <div id="sketch-border">
-      <div id="sketch-holder">
-        <!-- Our sketch will go here! -->
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <!-- <script src="/__/firebase/6.3.1/firebase-app.js"></script> -->
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#reserved-urls -->
+
+  <!-- Initialize Firebase -->
+  <!-- <script src="/__/firebase/init.js"></script> -->
+  <div style="width: 100%; display: block">
+    <div id="left-side">
+      <div id='control-holder'>
+        <div id="undo-button" class='control'>↩️&#8201;Undo</div>
+        <div id="clear-button" class='control'>❌&#8201;Clear</div>
+        <div id="save-button" class='control'>💾&#8201;Save</div>
+      </div>
+      <div id="sketch-border">
+        <div id="sketch-holder">
+          <div id="input-holder" class='hidden'>
+
+            <!-- Our sketch will go here! -->
+          </div>
+          <!-- Our sketch will go here! -->
+        </div>
+
+      </div>
+      <div id=bottom-row>
+        <div id="swatch-holder">
+          <div id="swatch1" class="swatch"></div>
+          <div id="swatch2" class="swatch"></div>
+          <div id="swatch3" class="swatch"></div>
+          <div id="swatch4" class="swatch"></div>
+          <div id="swatch5" class="swatch"></div>
+          <div id="swatch6" class="swatch"></div>
+        </div>
+        <div id="brush-size-holder">
+          <div id="minus-button" class="brush-size">-</div>
+          <div id="plus-button" class="brush-size">+</div>
+        </div>
       </div>
     </div>
-    <div id=bottom-row>
-      <div id="swatch-holder">
-        <div id="swatch1" class="swatch"></div>
-        <div id="swatch2" class="swatch"></div>
-        <div id="swatch3" class="swatch"></div>
-        <div id="swatch4" class="swatch"></div>
-        <div id="swatch5" class="swatch"></div>
-        <div id="swatch6" class="swatch"></div>
-      </div>
-      <div id="brush-size-holder">
-        <div id="minus-button" class="brush-size">-</div>
-        <div id="plus-button" class="brush-size">+</div>
-      </div>
+    <div id="right-side">
+      <div id="preview-image"></div>
+      <img id="sock-image" src="https://static1.squarespace.com/static/5829fe748419c24bb271b76f/t/5d3696d84515900001276cf2/1563858648777/input.jpg">
     </div>
-  </div>
-  <div id="right-side">
-    <div id="preview-image"></div>
-    <img id="sock-image" src="https://static1.squarespace.com/static/5829fe748419c24bb271b76f/t/5d3696d84515900001276cf2/1563858648777/input.jpg">
   </div>
 </body>
 
