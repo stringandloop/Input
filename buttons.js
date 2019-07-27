@@ -151,3 +151,51 @@ function plus() {
     select('#minus-button').style('opacity: 1;');
   }
 }
+
+function floodFill() {
+  if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+  saveGrid();
+  //take new cellValues
+  let x = floor(map(mouseX, 0, cellW * rowLen, 0, rowLen));
+  let y = floor(map(mouseY, 0, cellH * colLen, 0, colLen));
+
+  //to compare colors check and compare the indidivual values
+  let r = red(pixels[index(x, y)]);
+  let g = blue(pixels[index(x, y)]);
+  let b = green(pixels[index(x, y)]);
+
+  let activer = red(activeColor);
+  let activeg = blue(activeColor);
+  let activeb = green(activeColor);
+
+    if (str(r, g, b) != str(activer, activeg, activeb)) {
+      floodFillInner(x, y, r, g, b);
+    }
+
+  redraw();
+  localStorage.setItem("pixels", JSON.stringify(pixels));
+  sendImage();
+  }
+}
+
+
+function floodFillInner(x, y, r, g, b) {
+  if (x < 0 || x > rowLen - 1 || y < 0 || y > colLen - 1) {
+    return; // already go back
+  }
+
+  let r2 = red(pixels[index(x, y)]);
+  let g2 = blue(pixels[index(x, y)]);
+  let b2 = green(pixels[index(x, y)]);
+
+  if (str(r, g, b) != str(r2, g2, b2)) {
+    return;
+  }
+
+  pixels[index(x, y)] = activeColor; // mark the point so that I know if I passed through it.
+
+  floodFillInner(x + 1, y, r, g, b); // then i can either go south
+  floodFillInner(x - 1, y, r, g, b); // or north
+  floodFillInner(x, y + 1, r, g, b); // or east
+  floodFillInner(x, y - 1, r, g, b); // or west
+}

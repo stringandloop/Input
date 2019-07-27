@@ -1,5 +1,7 @@
 let sketch;
 let pixels = [];
+let visit = [];
+let count = 0;
 
 let cellW, cellH;
 
@@ -9,12 +11,12 @@ let undoState = 0;
 let maxUndo = 100;
 let savedGrids = [];
 
-let dither = true;
+let dither = false;
 
 let rowLen = 24; // cells
 let colLen = 34; // cells
 
-let brush = 2;
+let brushSize = 2;
 let activeColor;
 
 let filename;
@@ -27,11 +29,11 @@ function setup() {
 
   color1 = color(201, 33, 33); // red
   color2 = color(33, 33, 201); // blue
-  color3 = color(255); // white
+  color3 = color(255, 255, 255); // white
   color4 = color(120, 120, 120); // grey
   color5 = color(251, 190, 44); // gold
-  color6 = color(0); // black
-  bg = color(0);
+  color6 = color(0, 0, 0); // black
+  bg = color(0, 0, 0);
 
   swatches = [color1, color2, color3, color4, color5, color6];
   activeColor = color1;
@@ -62,6 +64,8 @@ function setup() {
   brushButtons();
   controlButtons();
   noLoop();
+
+
 }
 
 function draw() {
@@ -70,12 +74,13 @@ function draw() {
   let pushCursorX = 0;
   let pushCursorY = 0;
 
-  if (brush == 2) {
+  if (brushSize == 2) {
     pushCursorX = .5 * cellW;
     pushCursorY = 1 * cellH;
-  } else if (brush == 3) {
+  } else if (brushSize == 3) {
     pushCursorY = -.5 * cellH;
   }
+
 
 
 
@@ -100,16 +105,16 @@ function draw() {
       let x = round(pcellX);
       let y = round(pcellY);
 
-      if (brush == 1) {
+      if (brushSize == 1) {
         checkPixel(x, y);
-      } else if (brush == 2) {
+      } else if (brushSize == 2) {
         checkPixel(x, y);
         checkPixel(x, y - 1);
         checkPixel(x, y - 2);
         checkPixel(x - 1, y);
         checkPixel(x - 1, y - 1);
         checkPixel(x - 1, y - 2);
-      } else if (brush == 3) {
+      } else if (brushSize == 3) {
         checkPixel(x, y - 1);
         checkPixel(x, y);
         checkPixel(x, y + 1);
@@ -138,28 +143,29 @@ function draw() {
     let colorCellX = floor(map(mouseX, 0, cellW * rowLen, 0, rowLen));
     let colorCellY = floor(map(mouseY, 0, cellH * colLen, 0, colLen));
 
-    let r = red(pixels[(rowLen * colorCellY) + colorCellX]);
-    let g = green(pixels[(rowLen * colorCellY) + colorCellX]);
-    let b = blue(pixels[(rowLen * colorCellY) + colorCellX]);
-
+    let r = red(pixels[index(colorCellX, colorCellY)]);
+    let g = green(pixels[index(colorCellX, colorCellY)]);
+    let b = blue(pixels[index(colorCellX, colorCellY)]);
 
     if ((r + g + b) / 3 > 200) {
       fill(55, 100);
     } else {
       fill(200, 100);
     }
-    if (brush == 1) {
+    if (brushSize == 1) {
       //fill(red(activeColor), green(activeColor), blue(activeColor), 150);
       // rect(mouseX - cellW * .5, mouseY - cellH * .5, cellW, cellH);
       rect(cellX * cellW, cellY * cellH, cellW, cellH);
-    } else if (brush == 2) {
+    } else if (brushSize == 2) {
       // rect(mouseX - cellW * 1.5, mouseY - cellH * 1.5, cellW * 2, cellH * 2);
       rect((cellX - 1) * cellW, (cellY - 2) * cellH, cellW * 2, cellH * 3);
-    } else if (brush == 3) {
+    } else if (brushSize == 3) {
       //rect(mouseX - cellW * 1.5, mouseY - cellH * 1.5, cellW * 3, cellH * 4);
       rect((cellX - 1) * cellW, (cellY - 1) * cellH, cellW * 3, cellH * 4);
     }
   }
+
+
 
   noStroke();
   let fps = frameRate();
@@ -168,6 +174,10 @@ function draw() {
 
   pmouseX = mouseX;
   pmouseY = mouseY;
+
+  if (cellX == 0) {
+    //fillTrigger();
+  }
 }
 
 
@@ -196,12 +206,13 @@ function canvasReleased() {
 function drawPixels() {
   for (let i = 0; i < rowLen; i++) {
     for (let j = 0; j < colLen; j++) {
-      let pixel = pixels[(rowLen * j) + i];
+      let pixel = pixels[index(i, j)];
       fill(pixel);
       rect(cellW * i, cellH * j, cellW, cellH);
     }
   }
 }
+
 
 function drawGrid() {
   stroke(255, 100);
@@ -219,13 +230,13 @@ function drawGrid() {
 function checkPixel(x, y) {
   if (x >= 0 && x < rowLen && y >= 0 && y < colLen) {
     if (dither == false) {
-      pixels[(rowLen * y) + x] = activeColor;
+      pixels[index(x, y)] = activeColor;
     } else if (dither == true) {
       if (x % 2 == 0 && (y % 4 == 0 || y % 4 == 1)) {
-        pixels[(rowLen * y) + x] = activeColor;
+        pixels[index(x, y)] = activeColor;
       }
       if (x % 2 == 1 && (y % 4 == 2 || y % 4 == 3)) {
-        pixels[(rowLen * y) + x] = activeColor;
+        pixels[index(x, y)] = activeColor;
       }
     }
   }
@@ -239,11 +250,12 @@ function loadSavedPixels() {
   if (localStorage.getItem("pixels")) {
     let storedPixels = JSON.parse(localStorage.getItem("pixels"));
     if (storedPixels.length == pixels.length) {
-      for (let i = 0; i < rowLen * colLen; i++) {
-        let r = storedPixels[i].levels[0]
-        let g = storedPixels[i].levels[1]
-        let b = storedPixels[i].levels[2]
-        pixels[i] = color(r, g, b);
+      for (let i = 0; i < pixels.length; i++) {
+        let r = storedPixels[i].levels[0];
+        let g = storedPixels[i].levels[1];
+        let b = storedPixels[i].levels[2];
+        let pixelColor = color(r, g, b);
+        pixels[i] = pixelColor;
       }
     }
     sendImage();
@@ -281,4 +293,12 @@ function sketchListeners() {
 
   select('#sketch-holder').touchEnded(canvasReleased); // Support touch devices
   select('#sketch-holder').mouseReleased(canvasReleased);
+}
+
+function index(x, y) {
+  return (rowLen * y + x);
+}
+
+function keyPressed() {
+  floodFill();
 }
