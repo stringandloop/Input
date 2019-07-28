@@ -81,12 +81,14 @@ function saveButton() {
 }
 
 function createPalette() {
-createSwatch(swatch1, 'swatch1', color1);
-createSwatch(swatch2, 'swatch2', color2);
-createSwatch(swatch3, 'swatch3', color3);
-createSwatch(swatch4, 'swatch4', color4);
-createSwatch(swatch5, 'swatch5', color5);
-createSwatch(swatch6, 'swatch6', color6);
+  createSwatch(swatch1, 'swatch1', color1);
+  createSwatch(swatch2, 'swatch2', color2);
+  createSwatch(swatch3, 'swatch3', color3);
+  createSwatch(swatch4, 'swatch4', color4);
+  createSwatch(swatch5, 'swatch5', color5);
+  createSwatch(swatch6, 'swatch6', color6);
+
+  select('#swatch1').style('outline', 'solid 4px black');
 }
 
 function createSwatch(element, name, color) {
@@ -117,20 +119,28 @@ function swatchButton(color, name) {
 }
 
 function brushButtons() {
+  select('#plus-button').addClass('brush-size-on');
   select('#plus-button').mousePressed(plus);
+  select('#minus-button').addClass('brush-size-on');
   select('#minus-button').mousePressed(minus);
 }
 
 
 function minus() {
-  if (brush == 3) {
-    brush = 2;
+  if (brushSize == 4) {
+    brushSize = 3;
     select('#plus-button').addClass('brush-size-on');
     select('#plus-button').style('opacity: 1;');
     select('#minus-button').addClass('brush-size-on');
     select('#minus-button').style('opacity: 1;');
-  } else if (brush == 2) {
-    brush = 1;
+  } else if (brushSize == 3) {
+    brushSize = 2;
+    select('#plus-button').addClass('brush-size-on');
+    select('#plus-button').style('opacity: 1;');
+    select('#minus-button').addClass('brush-size-on');
+    select('#minus-button').style('opacity: 1;');
+  } else if (brushSize == 2) {
+    brushSize = 1;
     select('#plus-button').style('opacity: 1;');
     select('#minus-button').removeClass('brush-size-on');
     select('#minus-button').style('opacity: .15;');
@@ -138,14 +148,20 @@ function minus() {
 }
 
 function plus() {
-  if (brush == 1) {
-    brush = 2;
+  if (brushSize == 1) {
+    brushSize = 2;
     select('#plus-button').addClass('brush-size-on');
     select('#plus-button').style('opacity: 1;');
     select('#minus-button').addClass('brush-size-on');
     select('#minus-button').style('opacity: 1;');
-  } else if (brush == 2) {
-    brush = 3;
+  } else if (brushSize == 2) {
+    brushSize = 3;
+    select('#plus-button').addClass('brush-size-on');
+    select('#plus-button').style('opacity: 1;');
+    select('#minus-button').addClass('brush-size-on');
+    select('#minus-button').style('opacity: 1;');
+  } else if (brushSize == 3) {
+    brushSize = 4;
     select('#plus-button').removeClass('.brush-size-on');
     select('#plus-button').style('opacity: .15;');
     select('#minus-button').style('opacity: 1;');
@@ -153,40 +169,39 @@ function plus() {
 }
 
 function floodFill() {
-  if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
-  saveGrid();
-  //take new cellValues
-  let x = floor(map(mouseX, 0, cellW * rowLen, 0, rowLen));
-  let y = floor(map(mouseY, 0, cellH * colLen, 0, colLen));
+  if (gridCheck) {
+    saveGrid();
+    //take new cellValues
+    let x = floor(map(mouseX, 0, cellW * rowLen, 0, rowLen));
+    let y = floor(map(mouseY, 0, cellH * colLen, 0, colLen));
 
-  //to compare colors check and compare the indidivual values
-  let r = red(pixels[index(x, y)]);
-  let g = blue(pixels[index(x, y)]);
-  let b = green(pixels[index(x, y)]);
+    //to compare colors check and compare the indidivual values
+    let r = pixels[index(x, y)].levels[0];
+    let g = pixels[index(x, y)].levels[1];
+    let b = pixels[index(x, y)].levels[2];
 
-  let activer = red(activeColor);
-  let activeg = blue(activeColor);
-  let activeb = green(activeColor);
+    let activer = activeColor.levels[0];
+    let activeg = activeColor.levels[1];
+    let activeb = activeColor.levels[2];
 
     if (str(r, g, b) != str(activer, activeg, activeb)) {
       floodFillInner(x, y, r, g, b);
     }
 
-  redraw();
-  localStorage.setItem("pixels", JSON.stringify(pixels));
-  sendImage();
+    redraw();
+    localStorage.setItem("pixels", JSON.stringify(pixels));
+    sendImage();
   }
 }
-
 
 function floodFillInner(x, y, r, g, b) {
   if (x < 0 || x > rowLen - 1 || y < 0 || y > colLen - 1) {
     return; // already go back
   }
 
-  let r2 = red(pixels[index(x, y)]);
-  let g2 = blue(pixels[index(x, y)]);
-  let b2 = green(pixels[index(x, y)]);
+  let r2 = pixels[index(x, y)].levels[0];
+  let g2 = pixels[index(x, y)].levels[1];
+  let b2 = pixels[index(x, y)].levels[2];
 
   if (str(r, g, b) != str(r2, g2, b2)) {
     return;

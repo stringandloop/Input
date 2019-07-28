@@ -38,10 +38,8 @@ function setup() {
   swatches = [color1, color2, color3, color4, color5, color6];
   activeColor = color1;
 
-
   noStroke();
   background(bg);
-
 
   sketch = document.getElementById('sketch-holder');
 
@@ -64,8 +62,6 @@ function setup() {
   brushButtons();
   controlButtons();
   noLoop();
-
-
 }
 
 function draw() {
@@ -83,69 +79,31 @@ function draw() {
 
 
 
-
-  let cellX = floor(map(mouseX + pushCursorX, 0, cellW * rowLen, 0, rowLen));
-  let cellY = floor(map(mouseY + pushCursorY, 0, cellH * colLen, 0, colLen));
-
-  if (mouseIsPressed && mouseX > 0 && mouseX < width && mouseY > 0 && mouseX) {
-    let pcellX = floor(map(pmouseX + pushCursorX, 0, cellW * rowLen, 0, rowLen));
-    let pcellY = floor(map(pmouseY + pushCursorY, 0, cellH * colLen, 0, colLen));
-
-    let maxLerp = 1;
-    maxLerp = dist(pmouseX, pmouseY, mouseX, mouseY) + 1;
-    maxLerp = constrain(maxLerp, 0, 200);
-
-    for (let i = 0; i < maxLerp; i++) {
-
-      // interpolate to from pcellCoord to the ycellCoord
-      pcellX = lerp(pcellX, cellX, 0.04);
-      pcellY = lerp(pcellY, cellY, 0.04);
-
-      // do not round the lerp values since. Only the final coordinates used for painting while interpoloation continues to happen
-      let x = round(pcellX);
-      let y = round(pcellY);
-
-      if (brushSize == 1) {
-        checkPixel(x, y);
-      } else if (brushSize == 2) {
-        checkPixel(x, y);
-        checkPixel(x, y - 1);
-        checkPixel(x, y - 2);
-        checkPixel(x - 1, y);
-        checkPixel(x - 1, y - 1);
-        checkPixel(x - 1, y - 2);
-      } else if (brushSize == 3) {
-        checkPixel(x, y - 1);
-        checkPixel(x, y);
-        checkPixel(x, y + 1);
-        checkPixel(x, y + 2);
-        //
-        checkPixel(x + 1, y - 1);
-        checkPixel(x + 1, y);
-        checkPixel(x + 1, y + 1);
-        checkPixel(x + 1, y + 2);
-        //
-        checkPixel(x - 1, y - 1);
-        checkPixel(x - 1, y);
-        checkPixel(x - 1, y + 1);
-        checkPixel(x - 1, y + 2);
-      }
-    }
+  let cellX = (floor((mouseX + pushCursorX) / cellW));
+  let cellY = (floor((mouseY + pushCursorY) / cellH));
+  //let cellX = floor(map(mouseX + pushCursorX, 0, cellW * rowLen, 0, rowLen));
+  //let cellY = floor(map(mouseY + pushCursorY, 0, cellH * colLen, 0, colLen));
+  if (mouseIsPressed && gridCheck()) {
+    brush(cellX, cellY, pushCursorX, pushCursorY);
   }
+
 
   drawPixels();
 
   fill(255, 100);
-  if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height && cursor == true) {
+  if (gridCheck() && cursor == true) {
 
     //take new cell values without CursorPushY that can take rgb values from
     //within the pixel color values from within the array bounds
-    let colorCellX = floor(map(mouseX, 0, cellW * rowLen, 0, rowLen));
-    let colorCellY = floor(map(mouseY, 0, cellH * colLen, 0, colLen));
+    let colorCellX = (floor((mouseX) / cellW));
+    let colorCellY = (floor((mouseY) / cellH));
+    print(colorCellY);
 
-    let r = red(pixels[index(colorCellX, colorCellY)]);
-    let g = green(pixels[index(colorCellX, colorCellY)]);
-    let b = blue(pixels[index(colorCellX, colorCellY)]);
+    //assuming getting the array value directly is faster than p5.js's
+    //red, green and blue functions.
+    let r = pixels[index(colorCellX, colorCellY)].levels[0];
+    let g = pixels[index(colorCellX, colorCellY)].levels[1];
+    let b = pixels[index(colorCellX, colorCellY)].levels[2];
 
     if ((r + g + b) / 3 > 200) {
       fill(55, 100);
@@ -158,8 +116,11 @@ function draw() {
       rect(cellX * cellW, cellY * cellH, cellW, cellH);
     } else if (brushSize == 2) {
       // rect(mouseX - cellW * 1.5, mouseY - cellH * 1.5, cellW * 2, cellH * 2);
-      rect((cellX - 1) * cellW, (cellY - 2) * cellH, cellW * 2, cellH * 3);
+      rect((cellX - 1) * cellW, (cellY - 2) * cellH, cellW * 2, cellH * 2);
     } else if (brushSize == 3) {
+      // rect(mouseX - cellW * 1.5, mouseY - cellH * 1.5, cellW * 2, cellH * 2);
+      rect((cellX - 1) * cellW, (cellY - 2) * cellH, cellW * 2, cellH * 3);
+    } else if (brushSize == 4) {
       //rect(mouseX - cellW * 1.5, mouseY - cellH * 1.5, cellW * 3, cellH * 4);
       rect((cellX - 1) * cellW, (cellY - 1) * cellH, cellW * 3, cellH * 4);
     }
@@ -175,8 +136,11 @@ function draw() {
   pmouseX = mouseX;
   pmouseY = mouseY;
 
-  if (cellX == 0) {
-    //fillTrigger();
+  // Invoiking loop results in smoother framerate than using redraw
+  // with mouse move.
+  count++;
+  if (count > 1) {
+    noLoop();
   }
 }
 
@@ -228,6 +192,7 @@ function drawGrid() {
 }
 
 function checkPixel(x, y) {
+
   if (x >= 0 && x < rowLen && y >= 0 && y < colLen) {
     if (dither == false) {
       pixels[index(x, y)] = activeColor;
@@ -268,8 +233,14 @@ function cursorOn() {
 
 function cursorOff() {
   cursor = false;
-  redraw(); // redraw the canvas one time to remove the cursor
+  noLoop();
 }
+
+function cursorMoved() {
+  count = 0;
+  loop();
+}
+
 
 function sketchListeners() {
   // Prevent scrolling on touch screens when over the Canvas
@@ -281,8 +252,8 @@ function sketchListeners() {
   /*mouseDragged is not an equivilent method for p5js, so use touchMoved
   to achiveve the same effect.
   */
-  select('#sketch-holder').touchMoved(redraw); // Support touch devices
-  select('#sketch-holder').mouseMoved(redraw);
+  select('#sketch-holder').touchMoved(cursorMoved); // Support touch devices
+  select('#sketch-holder').mouseMoved(cursorMoved);
 
   // Hides cursor when mouse is not on the canvas
   select('#sketch-holder').mouseOver(cursorOn);
@@ -301,4 +272,10 @@ function index(x, y) {
 
 function keyPressed() {
   floodFill();
+}
+
+function gridCheck() {
+  if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+    return true;
+  }
 }
