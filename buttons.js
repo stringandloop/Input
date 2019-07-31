@@ -30,7 +30,10 @@ function controlButtons() {
   select('#undo-button').style('opacity: .15;')
   //
   select('#save-button').mousePressed(saveButton);
-  //
+  select('#submit-button').mousePressed(submit);
+
+  hideModal();
+
   select('#clear-button').mousePressed(clearButton);
 }
 
@@ -74,10 +77,11 @@ function saveButton() {
       gridImg.rect(i, j, 1, 1);
     }
   }
-  menu = true;
+  modal = true;
+  print(modal);
   select('#modal').style('display: block;');
-  //let filename = prompt("What is your name") + '-stringandloop-input.png';
-//  save(gridImg, filename);
+  select('#modal').style('opacity: 1;');
+  ;
 }
 
 function createPalette() {
@@ -216,5 +220,34 @@ function floodFillInner(x, y, r, g, b) {
 }
 
 function submit() {
-  
+  let checkedValue = document.getElementById('input-checkbox').checked;
+  let inputAuthor = document.getElementById('input-author').value;
+  let inputID = document.getElementById('input-id').value;
+
+  print(checkedValue, inputAuthor, inputID);
+  let filename = 'stringandloop-input.png';
+  if (inputAuthor.length > 0) {
+    filename = inputAuthor + '-' + filename;
+  }
+  if (checkedValue == false) {
+    print('Please accept the terms and conditions')
+  }
+  if (checkedValue == true) {
+    save(gridImg, filename);
+  }
+}
+
+function hideModal() {
+  var modal = document.getElementById('modal');
+
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      select('#modal').style('display: none;');
+      select('#modal').style('opacity: 0;');
+      // Clear modal values
+      document.getElementById('input-author').value = "";
+      document.getElementById('input-id').value = "";
+      document.getElementById('input-checkbox').checked = false;
+    }
+  }
 }

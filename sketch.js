@@ -23,7 +23,7 @@ let brushSize = 2;
 let activeColor;
 
 let filename;
-let menu = false;
+let modal = false;
 
 let cursor = true;
 

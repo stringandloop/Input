@@ -9,27 +9,48 @@
   <script src="sketch.js"></script>
   <script src="buttons.js"></script>
   <script src="tools.js"></script>
+
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/6.3.3/firebase-app.js"></script>
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+       https://firebase.google.com/docs/web/setup#config-web-app -->
+
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyChytjaeKiLiVtBktnM5lNrnI-HsnlSY9U",
+      authDomain: "stringandloop-input.firebaseapp.com",
+      databaseURL: "https://stringandloop-input.firebaseio.com",
+      projectId: "stringandloop-input",
+      storageBucket: "",
+      messagingSenderId: "922401397348",
+      appId: "1:922401397348:web:157a4b8b928a2b1e"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+  </script>
+  
 </head>
 
 <body>
-  <!-- The core Firebase JS SDK is always required and must be listed first -->
-  <!-- <script src="/__/firebase/6.3.1/firebase-app.js"></script> -->
-
-  <!-- TODO: Add SDKs for Firebase products that you want to use
-     https://firebase.google.com/docs/web/setup#reserved-urls -->
-
-  <!-- Initialize Firebase -->
-  <!-- <script src="/__/firebase/init.js"></script> -->
 
   <div style="width: 100%; display: block">
+
+
+
+
+
     <div id="modal">
       <div id="modal-inner">
         <div id="modal-center">
-        <input type="text" name="fname" value="First Name" style="width: 25%;" required>
-        <input type="text" name="lname" value="Last Name" style="width: 25%;" required><br>
-        <input type="text" name="id" value="ID" style="width: 52%;"><br>
-        <input type="checkbox">I accept the terms and conditions<br> 
-        <button type="submit" value="Sign Up" style="display: inline-block;">Submit</button>
+          <div id="input-title">
+            <h2>Upload your drawing to string&&loop's servers;</h2>
+          </div><br>
+          <input id="input-author" class="input-container form-item" type="text" name="unnamed" placeholder="Author" style="width: 60%;" required><br>
+          <input id="input-id" class="input-container form-item" type="text" name="id" placeholder="ID" style="width: 60%;"><br>
+          <div id="terms-conditions"><input id="input-checkbox" type="checkbox">I accept the terms and conditions<br></div>
+          <div id="submit-button" type="submit" value="Sign Up" style="display: inline-block;"><span class="submit-form-label sqs-system-button sqs-editable-button">Submit</span></div>
         </div>
       </div>
     </div>
@@ -68,6 +89,10 @@
       <div id="preview-image"></div>
       <img id="sock-image" src="https://static1.squarespace.com/static/5829fe748419c24bb271b76f/t/5d3696d84515900001276cf2/1563858648777/input.jpg">
     </div>
+
+
+
+
   </div>
 </body>
 
