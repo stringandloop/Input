@@ -2,16 +2,19 @@ let sketch;
 let pixels = [];
 let visit = [];
 let count = 0;
+let tool = 2; //standard brush
 
 let cellW, cellH;
+let startX, startY;
+
+let preview = true;
+let dither = false;
 
 let swatch1, swatch2, swatch3, swatch4, swatch5, swatch6, bg;
 
 let undoState = 0;
 let maxUndo = 100;
 let savedGrids = [];
-
-let dither = false;
 
 let rowLen = 24; // cells
 let colLen = 34; // cells
@@ -83,12 +86,21 @@ function draw() {
   let cellY = (floor((mouseY + pushCursorY) / cellH));
   //let cellX = floor(map(mouseX + pushCursorX, 0, cellW * rowLen, 0, rowLen));
   //let cellY = floor(map(mouseY + pushCursorY, 0, cellH * colLen, 0, colLen));
-  if (mouseIsPressed && gridCheck()) {
-    brush(cellX, cellY, pushCursorX, pushCursorY);
+
+  if (mouseIsPressed && gridCheck() && (tool == 1 || tool == 3) ) {
+    brushTool(cellX, cellY, pushCursorX, pushCursorY);
   }
 
+  // run 2x with inversed x values to mirror the brush
+  if (mouseIsPressed && gridCheck() && tool == 3) {
+    mirrorTool(cellX, cellY, pushCursorX, pushCursorY);
+  }
 
   drawPixels();
+
+  if (mouseIsPressed && gridCheck() && tool == 2) {
+    lineTool(cellX, cellY, startX, startY, pushCursorX, pushCursorY, preview);
+  }
 
   fill(255, 100);
   if (gridCheck() && cursor == true) {
@@ -97,7 +109,6 @@ function draw() {
     //within the pixel color values from within the array bounds
     let colorCellX = (floor((mouseX) / cellW));
     let colorCellY = (floor((mouseY) / cellH));
-    print(colorCellY);
 
     //assuming getting the array value directly is faster than p5.js's
     //red, green and blue functions.
@@ -116,7 +127,7 @@ function draw() {
       rect(cellX * cellW, cellY * cellH, cellW, cellH);
     } else if (brushSize == 2) {
       // rect(mouseX - cellW * 1.5, mouseY - cellH * 1.5, cellW * 2, cellH * 2);
-      rect((cellX - 1) * cellW, (cellY - 2) * cellH, cellW * 2, cellH * 2);
+      rect((cellX - 1) * cellW, (cellY - 1) * cellH, cellW * 2, cellH * 2);
     } else if (brushSize == 3) {
       // rect(mouseX - cellW * 1.5, mouseY - cellH * 1.5, cellW * 2, cellH * 2);
       rect((cellX - 1) * cellW, (cellY - 2) * cellH, cellW * 2, cellH * 3);
@@ -156,11 +167,26 @@ function canvasPressed() {
   saveGrid();
   pmouseX = mouseX;
   pmouseY = mouseY;
+
+  let pushCursorX = 0;
+  let pushCursorY = 0;
+
+  if (brushSize == 2) {
+    pushCursorX = .5 * cellW;
+    pushCursorY = 1 * cellH;
+  } else if (brushSize == 3) {
+    pushCursorY = -.5 * cellH;
+  }
+  preview = true;
+  startX = mouseX;
+  startY = mouseY;
   loop();
 }
 
 
 function canvasReleased() {
+  preview = false;
+  redraw();
   sendImage();
   localStorage.setItem("pixels", JSON.stringify(pixels));
   noLoop();
@@ -191,21 +217,37 @@ function drawGrid() {
   noStroke();
 }
 
-function checkPixel(x, y) {
+function placePixel(x, y) {
 
   if (x >= 0 && x < rowLen && y >= 0 && y < colLen) {
     if (dither == false) {
-      pixels[index(x, y)] = activeColor;
+      if (preview == false || tool == 1 || tool == 3) {
+        pixels[index(x, y)] = activeColor;
+      } else {
+        fill(activeColor);
+        rect(x * cellW, y * cellH, cellW, cellH);
+      }
     } else if (dither == true) {
       if (x % 2 == 0 && (y % 4 == 0 || y % 4 == 1)) {
-        pixels[index(x, y)] = activeColor;
+        if (preview == false || tool ==  1 || tool == 3) {
+          pixels[index(x, y)] = activeColor;
+        } else {
+          fill(activeColor);
+          rect(x * cellW, y * cellH, cellW, cellH);
+        }
       }
       if (x % 2 == 1 && (y % 4 == 2 || y % 4 == 3)) {
-        pixels[index(x, y)] = activeColor;
+        if (preview == false) {
+          pixels[index(x, y)] = activeColor;
+        } else {
+          fill(activeColor);
+          rect(x * cellW, y * cellH, cellW, cellH);
+        }
       }
     }
   }
 }
+
 
 function loadSavedPixels() {
   for (let i = 0; i < rowLen * colLen; i++) {

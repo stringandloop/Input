@@ -41,7 +41,6 @@ function undo() {
     for (let i = 0; i < rowLen * colLen; i++) {
       pixels[i] = savedGrids[undoState][i];
     }
-    print(undoState);
   }
   if (undoState == 0) {
     select('#undo-button').removeClass('undo-on');
@@ -76,8 +75,9 @@ function saveButton() {
     }
   }
   menu = true;
-  let filename = prompt("What is your name") + '-stringandloop-input.png';
-  save(gridImg, filename);
+  select('#modal').style('display: block;');
+  //let filename = prompt("What is your name") + '-stringandloop-input.png';
+//  save(gridImg, filename);
 }
 
 function createPalette() {
@@ -213,4 +213,8 @@ function floodFillInner(x, y, r, g, b) {
   floodFillInner(x - 1, y, r, g, b); // or north
   floodFillInner(x, y + 1, r, g, b); // or east
   floodFillInner(x, y - 1, r, g, b); // or west
+}
+
+function submit() {
+  
 }
