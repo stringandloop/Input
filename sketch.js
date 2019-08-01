@@ -30,6 +30,21 @@ let cursor = true;
 
 function setup() {
 
+
+  var database = firebase.database();
+
+  if (firebase.auth().currentUser !== null)
+        console.log("user id: " + firebase.auth().currentUser.uid);
+
+  var fruits = database.ref('backers/test');
+
+  var data = {
+    name: 'mango',
+    count: 2
+  }
+
+  fruits.update(data, finished);
+
   color1 = color(201, 33, 33); // red
   color2 = color(33, 33, 201); // blue
   color3 = color(255, 255, 255); // white
@@ -329,5 +344,13 @@ function keyPressed() {
 function gridCheck() {
   if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
     return true;
+  }
+}
+
+function finished(error) {
+  if (error) {
+    alert('ooops');
+  } else {
+    alert('data saved!');
   }
 }

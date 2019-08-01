@@ -1,6 +1,48 @@
 <html>
 
 <head>
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/6.3.3/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#config-web-app -->
+
+<script src="https://www.gstatic.com/firebasejs/6.3.3/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/6.3.3/firebase-auth.js"></script>
+
+  <script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyChytjaeKiLiVtBktnM5lNrnI-HsnlSY9U",
+    authDomain: "stringandloop-input.firebaseapp.com",
+    databaseURL: "https://stringandloop-input.firebaseio.com",
+    projectId: "stringandloop-input",
+    storageBucket: "stringandloop-input.appspot.com",
+    messagingSenderId: "922401397348",
+    appId: "1:922401397348:web:157a4b8b928a2b1e"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+  firebase.auth().signInWithEmailAndPassword('cblewisnj@gmail.com', 'password').catch(function(error) {
+  // Handle Errors here.
+  var errorCode = error.code;
+  var errorMessage = error.message;
+  // ...
+});
+
+
+firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    console.log(user);
+    // User is signed in.
+  } else {
+    // No user is signed in.
+  }
+});
+
+  </script>
+
   <title>My Sketch</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.js"></script>
@@ -9,35 +51,6 @@
   <script src="sketch.js"></script>
   <script src="buttons.js"></script>
   <script src="tools.js"></script>
-
-  <!-- The core Firebase JS SDK is always required and must be listed first -->
-  <script src="https://www.gstatic.com/firebasejs/6.3.3/firebase-app.js"></script>
-
-  <!-- TODO: Add SDKs for Firebase products that you want to use
-       https://firebase.google.com/docs/web/setup#config-web-app -->
-
-
-  <!-- The core Firebase JS SDK is always required and must be listed first -->
-  <script src="https://www.gstatic.com/firebasejs/6.3.3/firebase-app.js"></script>
-
-  <!-- TODO: Add SDKs for Firebase products that you want to use
-       https://firebase.google.com/docs/web/setup#config-web-app -->
-
-  <script>
-    // Your web app's Firebase configuration
-    var firebaseConfig = {
-      apiKey: "AIzaSyChytjaeKiLiVtBktnM5lNrnI-HsnlSY9U",
-      authDomain: "stringandloop-input.firebaseapp.com",
-      databaseURL: "https://stringandloop-input.firebaseio.com",
-      projectId: "stringandloop-input",
-      storageBucket: "stringandloop-input.appspot.com",
-      messagingSenderId: "922401397348",
-      appId: "1:922401397348:web:157a4b8b928a2b1e"
-    };
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-  </script>
-
 </head>
 
 <body>
