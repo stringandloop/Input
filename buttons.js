@@ -31,8 +31,8 @@ function controlButtons() {
   //
   select('#save-button').mousePressed(saveButton);
   select('#submit-button').mousePressed(submit);
-
-  hideModal();
+  select('#modal').mousePressed(hideModal);
+  //hideModal();
 
   select('#clear-button').mousePressed(clearButton);
 }
@@ -80,8 +80,7 @@ function saveButton() {
   modal = true;
   print(modal);
   select('#modal').style('display: block;');
-  select('#modal').style('opacity: 1;');
-  ;
+  select('#modal').style('opacity: 1;');;
 }
 
 function createPalette() {
@@ -240,14 +239,13 @@ function submit() {
 function hideModal() {
   var modal = document.getElementById('modal');
 
-  window.onclick = function(event) {
-    if (event.target == modal) {
-      select('#modal').style('display: none;');
-      select('#modal').style('opacity: 0;');
-      // Clear modal values
-      document.getElementById('input-author').value = "";
-      document.getElementById('input-id').value = "";
-      document.getElementById('input-checkbox').checked = false;
-    }
+  if (event.target == modal) {
+    select('#modal').style('display: none;');
+    select('#modal').style('opacity: 0;');
+    // Clear modal values
+    document.getElementById('input-author').value = "";
+    document.getElementById('input-id').value = "";
+    document.getElementById('input-checkbox').checked = false;
+
   }
 }

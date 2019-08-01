@@ -2,12 +2,12 @@ let sketch;
 let pixels = [];
 let visit = [];
 let count = 0;
-let tool = 2; //standard brush
+let tool = 1; //standard brush
 
 let cellW, cellH;
 let startX, startY;
 
-let preview = true;
+let preview = false;
 let dither = false;
 
 let swatch1, swatch2, swatch3, swatch4, swatch5, swatch6, bg;
@@ -75,8 +75,11 @@ function draw() {
 
   if (brushSize == 2) {
     pushCursorX = .5 * cellW;
-    pushCursorY = 1 * cellH;
+    pushCursorY = .5 * cellH;
   } else if (brushSize == 3) {
+    pushCursorX = .5 * cellW;
+    pushCursorY = 1 * cellH;
+  } else if (brushSize == 4) {
     pushCursorY = -.5 * cellH;
   }
 
@@ -87,7 +90,7 @@ function draw() {
   //let cellX = floor(map(mouseX + pushCursorX, 0, cellW * rowLen, 0, rowLen));
   //let cellY = floor(map(mouseY + pushCursorY, 0, cellH * colLen, 0, colLen));
 
-  if (mouseIsPressed && gridCheck() && (tool == 1 || tool == 3) ) {
+  if (mouseIsPressed && gridCheck() && (tool == 1 || tool == 3)) {
     brushTool(cellX, cellY, pushCursorX, pushCursorY);
   }
 
@@ -98,14 +101,15 @@ function draw() {
 
   drawPixels();
 
-  if (mouseIsPressed && gridCheck() && tool == 2) {
+  if (mouseIsPressed && gridCheck() && startX && startY && tool == 2) {
+
     lineTool(cellX, cellY, startX, startY, pushCursorX, pushCursorY, preview);
   }
 
   fill(255, 100);
   if (gridCheck() && cursor == true) {
 
-    //take new cell values without CursorPushY that can take rgb values from
+    //take new cell values without pushCursorY that can take rgb values from
     //within the pixel color values from within the array bounds
     let colorCellX = (floor((mouseX) / cellW));
     let colorCellY = (floor((mouseY) / cellH));
@@ -137,15 +141,9 @@ function draw() {
     }
   }
 
-
-
   noStroke();
-  let fps = frameRate();
 
   drawGrid();
-
-  pmouseX = mouseX;
-  pmouseY = mouseY;
 
   // Invoiking loop results in smoother framerate than using redraw
   // with mouse move.
@@ -165,21 +163,18 @@ function windowResized() {
 
 function canvasPressed() {
   saveGrid();
+  redraw();
+
   pmouseX = mouseX;
   pmouseY = mouseY;
 
-  let pushCursorX = 0;
-  let pushCursorY = 0;
-
-  if (brushSize == 2) {
-    pushCursorX = .5 * cellW;
-    pushCursorY = 1 * cellH;
-  } else if (brushSize == 3) {
-    pushCursorY = -.5 * cellH;
+  if (mouseIsPressed) {
+    preview = true;
+    startX = mouseX;
+    startY = mouseY;
   }
-  preview = true;
-  startX = mouseX;
-  startY = mouseY;
+
+
   loop();
 }
 
@@ -187,9 +182,29 @@ function canvasPressed() {
 function canvasReleased() {
   preview = false;
   redraw();
+
+  startX = null;
+  startY = null;
   sendImage();
   localStorage.setItem("pixels", JSON.stringify(pixels));
   noLoop();
+}
+
+
+function cursorMoved() {
+
+  // update startX and startY after cursor movement for touch screens
+  // mouseX and mouseY only update on the drawing cycle so the same method
+  // used for mouse interactions with canvasPressed will not work.
+
+  if (preview == false) {
+    startX = mouseX;
+    startY = mouseY;
+    preview = true;
+  }
+
+  count = 0;
+  loop();
 }
 
 
@@ -229,7 +244,7 @@ function placePixel(x, y) {
       }
     } else if (dither == true) {
       if (x % 2 == 0 && (y % 4 == 0 || y % 4 == 1)) {
-        if (preview == false || tool ==  1 || tool == 3) {
+        if (preview == false || tool == 1 || tool == 3) {
           pixels[index(x, y)] = activeColor;
         } else {
           fill(activeColor);
@@ -276,11 +291,6 @@ function cursorOn() {
 function cursorOff() {
   cursor = false;
   noLoop();
-}
-
-function cursorMoved() {
-  count = 0;
-  loop();
 }
 
 
