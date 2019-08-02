@@ -60,7 +60,7 @@ function clearButton() {
   saveGrid();
   for (let i = 0; i < rowLen; i++) {
     for (let j = 0; j < colLen; j++) {
-      pixels[(rowLen * j) + i] = bg;
+      pixels[(rowLen * j) + i] = [bg[0], bg[1], bg[2]];
     }
   }
   sendImage();
@@ -96,7 +96,7 @@ function createPalette() {
 
 function createSwatch(element, name, color) {
   element = select('#' + str(name))
-  element.style('background-color', str(color));
+  element.style('background-color', 'rgb(' + color[0] + ', ' + color[1] + ', ' + color[2] + ')');
 
   element.style('outline', 'solid 1px lightgrey');
   //
@@ -113,7 +113,7 @@ function swatchButton(color, name) {
     select('#swatch5').style('outline', 'solid 1px lightgrey');
     select('#swatch6').style('outline', 'solid 1px lightgrey');
 
-    if ((red(color) + green(color) + blue(color)) / 3 > 50) {
+    if ((color[0] + color[1] + color[2]) / 3 > 50) {
       select('#' + str(name)).style('outline', 'solid 4px black');
     } else {
       select('#' + str(name)).style('outline', 'solid 4px grey');
@@ -179,13 +179,13 @@ function floodFill() {
     let y = floor(map(mouseY, 0, cellH * colLen, 0, colLen));
 
     //to compare colors check and compare the indidivual values
-    let r = pixels[index(x, y)].levels[0];
-    let g = pixels[index(x, y)].levels[1];
-    let b = pixels[index(x, y)].levels[2];
+    let r = pixels[index(x, y)][0];
+    let g = pixels[index(x, y)][1];
+    let b = pixels[index(x, y)][2];
 
-    let activer = activeColor.levels[0];
-    let activeg = activeColor.levels[1];
-    let activeb = activeColor.levels[2];
+    let activer = activeColor[0];
+    let activeg = activeColor[1];
+    let activeb = activeColor[2];
 
     if (str(r, g, b) != str(activer, activeg, activeb)) {
       floodFillInner(x, y, r, g, b);
@@ -202,15 +202,15 @@ function floodFillInner(x, y, r, g, b) {
     return; // already go back
   }
 
-  let r2 = pixels[index(x, y)].levels[0];
-  let g2 = pixels[index(x, y)].levels[1];
-  let b2 = pixels[index(x, y)].levels[2];
+  let r2 = pixels[index(x, y)][0];
+  let g2 = pixels[index(x, y)][1];
+  let b2 = pixels[index(x, y)][2];
 
   if (str(r, g, b) != str(r2, g2, b2)) {
     return;
   }
 
-  pixels[index(x, y)] = activeColor; // mark the point so that I know if I passed through it.
+  pixels[index(x, y)] = [activeColor[0], activeColor[1], activeColor[2]]; // mark the point so that I know if I passed through it.
 
   floodFillInner(x + 1, y, r, g, b); // then i can either go south
   floodFillInner(x - 1, y, r, g, b); // or north

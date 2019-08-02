@@ -29,29 +29,15 @@ let cursor = true;
 
 
 function setup() {
+  
 
-
-  var database = firebase.database();
-
-  if (firebase.auth().currentUser !== null)
-        console.log("user id: " + firebase.auth().currentUser.uid);
-
-  var fruits = database.ref('backers/test');
-
-  var data = {
-    name: 'mango',
-    count: 2
-  }
-
-  fruits.update(data, finished);
-
-  color1 = color(201, 33, 33); // red
-  color2 = color(33, 33, 201); // blue
-  color3 = color(255, 255, 255); // white
-  color4 = color(120, 120, 120); // grey
-  color5 = color(251, 190, 44); // gold
-  color6 = color(0, 0, 0); // black
-  bg = color(0, 0, 0);
+  color1 = [201, 33, 33]; // red
+  color2 = [33, 33, 201]; // blue
+  color3 = [255, 255, 255]; // white
+  color4 = [120, 120, 120]; // grey
+  color5 = [251, 190, 44]; // gold
+  color6 = [0, 0, 0]; // black
+  bg = [0, 0, 0];
 
   swatches = [color1, color2, color3, color4, color5, color6];
   activeColor = color1;
@@ -131,9 +117,9 @@ function draw() {
 
     //assuming getting the array value directly is faster than p5.js's
     //red, green and blue functions.
-    let r = pixels[index(colorCellX, colorCellY)].levels[0];
-    let g = pixels[index(colorCellX, colorCellY)].levels[1];
-    let b = pixels[index(colorCellX, colorCellY)].levels[2];
+    let r = pixels[index(colorCellX, colorCellY)][0];
+    let g = pixels[index(colorCellX, colorCellY)][1];
+    let b = pixels[index(colorCellX, colorCellY)][2];
 
     if ((r + g + b) / 3 > 200) {
       fill(55, 100);
@@ -190,6 +176,7 @@ function canvasPressed() {
   }
 
 
+
   loop();
 }
 
@@ -227,7 +214,7 @@ function drawPixels() {
   for (let i = 0; i < rowLen; i++) {
     for (let j = 0; j < colLen; j++) {
       let pixel = pixels[index(i, j)];
-      fill(pixel);
+      fill(pixel[0], pixel[1], pixel[2]);
       rect(cellW * i, cellH * j, cellW, cellH);
     }
   }
@@ -252,7 +239,7 @@ function placePixel(x, y) {
   if (x >= 0 && x < rowLen && y >= 0 && y < colLen) {
     if (dither == false) {
       if (preview == false || tool == 1 || tool == 3) {
-        pixels[index(x, y)] = activeColor;
+        pixels[index(x, y)] = [activeColor[0], activeColor[1], activeColor[2]];
       } else {
         fill(activeColor);
         rect(x * cellW, y * cellH, cellW, cellH);
@@ -260,7 +247,7 @@ function placePixel(x, y) {
     } else if (dither == true) {
       if (x % 2 == 0 && (y % 4 == 0 || y % 4 == 1)) {
         if (preview == false || tool == 1 || tool == 3) {
-          pixels[index(x, y)] = activeColor;
+          pixels[index(x, y)] = [activeColor[0], activeColor[1], activeColor[2]];
         } else {
           fill(activeColor);
           rect(x * cellW, y * cellH, cellW, cellH);
@@ -268,7 +255,7 @@ function placePixel(x, y) {
       }
       if (x % 2 == 1 && (y % 4 == 2 || y % 4 == 3)) {
         if (preview == false) {
-          pixels[index(x, y)] = activeColor;
+          pixels[index(x, y)] = [activeColor[0], activeColor[1], activeColor[2]];
         } else {
           fill(activeColor);
           rect(x * cellW, y * cellH, cellW, cellH);
@@ -281,19 +268,22 @@ function placePixel(x, y) {
 
 function loadSavedPixels() {
   for (let i = 0; i < rowLen * colLen; i++) {
-    pixels[i] = bg;
+    pixels[i] = [bg[0], bg[1], bg[2]];
   }
 
   if (localStorage.getItem("pixels")) {
     let storedPixels = JSON.parse(localStorage.getItem("pixels"));
     if (storedPixels.length == pixels.length) {
       for (let i = 0; i < pixels.length; i++) {
-        let r = storedPixels[i].levels[0];
-        let g = storedPixels[i].levels[1];
-        let b = storedPixels[i].levels[2];
-        let pixelColor = color(r, g, b);
+        let r = storedPixels[i][0];
+        let g = storedPixels[i][1];
+        let b = storedPixels[i][2];
+        let pixelColor = [r, g, b];
         pixels[i] = pixelColor;
       }
+    } else {
+      // clear old data if it's not compatible
+      removeItem('pixels');
     }
     sendImage();
   }
@@ -344,13 +334,5 @@ function keyPressed() {
 function gridCheck() {
   if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
     return true;
-  }
-}
-
-function finished(error) {
-  if (error) {
-    alert('ooops');
-  } else {
-    alert('data saved!');
   }
 }
