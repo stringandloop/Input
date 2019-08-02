@@ -1,13 +1,14 @@
 var database = firebase.database();
 
-var path = database.ref('backers/');
+var path = database.ref('backers/...');
 
 var data = {
-  pixels: pixels
+  pixels: pixels,
+  timestamp: new Date()
 }
 
 //Read data
-path.on('value', gotData, errData);
+path.orderByChild('plot').once('child_added', gotData, errData);
 
 function gotData(data){
   console.log('Read Successful:');

@@ -29,7 +29,7 @@ let cursor = true;
 
 
 function setup() {
-  
+
 
   color1 = [201, 33, 33]; // red
   color2 = [33, 33, 201]; // blue
