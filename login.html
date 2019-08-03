@@ -1,0 +1,45 @@
+<html>
+<head>
+  <title>string&&loop Input Login</title>
+  <link rel="stylesheet" href="login.css" />
+  <link rel="shortcut icon" type="image/x-icon" href="https://static1.squarespace.com/static/5829fe748419c24bb271b76f/t/583a1e51e4fcb5b7cf3936e8/favicon.ico">
+</head>
+<body>
+
+  <div id="login_div" class="main-div">
+    <h3>string&&loop Input</h3>
+    <!-- <form autocomplete="on"> -->
+    <input type="email" placeholder="Email..." id="email_field" autocomplete="on"/>
+    <input type="password" placeholder="Password..." id="password_field" autocomplete="on" onclick="enter(password_field)"/>
+    <!-- </form> -->
+
+    <a class="button" id="login-button" onclick="login()">Login</a>
+  </div>
+
+  <div id="user_div" class="loggedin-div">
+    <h3>Welcome!</h3>
+    <p id="user_para">You're currently logged in.</p>
+    <a class="button" onclick="logout()">Logout</a>
+  </div>
+
+
+
+  <script src="https://www.gstatic.com/firebasejs/6.3.3/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var firebaseConfig = {
+      apiKey: "AIzaSyChytjaeKiLiVtBktnM5lNrnI-HsnlSY9U",
+      authDomain: "stringandloop-input.firebaseapp.com",
+      databaseURL: "https://stringandloop-input.firebaseio.com",
+      projectId: "stringandloop-input",
+      storageBucket: "stringandloop-input.appspot.com",
+      messagingSenderId: "922401397348",
+      appId: "1:922401397348:web:157a4b8b928a2b1e"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+  </script>
+  <script src="login.js"></script>
+
+</body>
+</html>

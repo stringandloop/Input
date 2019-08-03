@@ -51,7 +51,7 @@ function undo() {
   }
 
   sendImage();
-  localStorage.setItem("pixels", JSON.stringify(pixels));
+  localStorage.setItem("pixels", JSON.stringify(compress(pixels)));
   redraw();
 }
 
@@ -64,7 +64,7 @@ function clearButton() {
     }
   }
   sendImage();
-  localStorage.setItem("pixels", JSON.stringify(pixels));
+  localStorage.setItem("pixels", JSON.stringify(compress(pixels)));
   redraw();
 }
 
@@ -192,7 +192,7 @@ function floodFill() {
     }
 
     redraw();
-    localStorage.setItem("pixels", JSON.stringify(pixels));
+    localStorage.setItem("pixels", JSON.stringify(compress(pixels)));
     sendImage();
   }
 }
@@ -232,7 +232,14 @@ function submit() {
     print('Please accept the terms and conditions')
   }
   if (checkedValue == true) {
-    save(gridImg, filename);
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        var uid = firebase.auth().currentUser.uid;
+        console.log(uid);
+      } else {
+
+      }
+    });
   }
 }
 

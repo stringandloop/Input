@@ -1,5 +1,6 @@
 let sketch;
 let pixels = [];
+let compressedPixels = '';
 let visit = [];
 let count = 0;
 let tool = 1; //standard brush
@@ -10,7 +11,7 @@ let startX, startY;
 let preview = false;
 let dither = false;
 
-let swatch1, swatch2, swatch3, swatch4, swatch5, swatch6, bg;
+let color1, color2, color3, color4, color5, color6, bg;
 
 let undoState = 0;
 let maxUndo = 100;
@@ -29,7 +30,6 @@ let cursor = true;
 
 
 function setup() {
-
 
   color1 = [201, 33, 33]; // red
   color2 = [33, 33, 201]; // blue
@@ -53,7 +53,6 @@ function setup() {
   let canvas = createCanvas(sketch.offsetWidth, cellH * colLen);
 
   loadSavedPixels();
-
   // Move the canvas so it’s inside our <div id="sketch-holder">.
   canvas.parent('sketch-holder');
   gridImg = createGraphics(rowLen, colLen);
@@ -63,6 +62,7 @@ function setup() {
   select('#sketch-holder').style('padding-top: 0%;')
 
   createPalette();
+  createUsername();
   brushButtons();
   controlButtons();
   noLoop();
@@ -188,7 +188,7 @@ function canvasReleased() {
   startX = null;
   startY = null;
   sendImage();
-  localStorage.setItem("pixels", JSON.stringify(pixels));
+  localStorage.setItem("pixels", JSON.stringify(compress(pixels)));
   noLoop();
 }
 
@@ -275,11 +275,12 @@ function loadSavedPixels() {
     let storedPixels = JSON.parse(localStorage.getItem("pixels"));
     if (storedPixels.length == pixels.length) {
       for (let i = 0; i < pixels.length; i++) {
-        let r = storedPixels[i][0];
-        let g = storedPixels[i][1];
-        let b = storedPixels[i][2];
+        let r = decode(storedPixels.charAt(i))[0];
+        let g = decode(storedPixels.charAt(i))[1];
+        let b = decode(storedPixels.charAt(i))[2];
         let pixelColor = [r, g, b];
         pixels[i] = pixelColor;
+        compressedPixels += storedPixels.charAt(i);
       }
     } else {
       // clear old data if it's not compatible
@@ -335,4 +336,66 @@ function gridCheck() {
   if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
     return true;
   }
+}
+
+function createUsername() {
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      // User is signed in.
+      var email_id = firebase.auth().currentUser.email;
+      var uid = firebase.auth().currentUser.uid;
+      select('#header').html('Logged In As: ' + str(email_id) + ' | ' + '<a href="./login.html">Logout</a>');
+      write(uid);
+      console.log(user.displayName);
+    } else {
+      select('#header').html('<a href="./login.html">Login</a>');
+    }
+  });
+}
+
+
+
+function decode(p) {
+
+  if (p == '1') {
+    return color1;
+  } else if (p == '2') {
+    return color2;
+  } else if (p == '3') {
+    return color3;
+  } else if (p == '4') {
+    return color4;
+  } else if (p == '5') {
+    return color5;
+  } else if (p == '6') {
+    return color6;
+  } else {
+    return bg;
+  }
+}
+
+function encode(p) {
+  if (p == '201, 33, 33') { //red
+    return '1';
+  } else if (p == '33, 33, 201') { // blue
+    return '2';
+  } else if (p == '255, 255, 255') { // white
+    return '3';
+  } else if (p == '120, 120, 120') { // grey
+    return '4';
+  } else if (p == '251, 190, 44') { // gold
+    return '5';
+  } else if (p == '0, 0, 0') { // black
+    return '6';
+  } else {
+    return '6';
+  }
+}
+
+function compress(data) {
+  let compressed = '';
+  for (let i = 0; i < data.length; i++) {
+    compressed += encode(str(data[i][0]) + ', ' + str(data[i][1]) + ', ' + str(data[i][2]));
+  }
+  return compressed;
 }

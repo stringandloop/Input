@@ -1,34 +1,44 @@
 var database = firebase.database();
 
-var path = database.ref('backers/...');
+var data = {}
 
-var data = {
-  pixels: pixels,
-  timestamp: new Date()
+function read(uid) {
+  //Read data
+  var path = database.ref('backers/' + str(uid));
+  path.orderByChild('plot').once('child_added', gotData, errData);
 }
 
-//Read data
-path.orderByChild('plot').once('child_added', gotData, errData);
+function gotData(data) {
 
-function gotData(data){
   console.log('Read Successful:');
   console.log(data.val());
 }
 
-function errData(err){
- console.log('Read Error!');
- console.log(err);
+function errData(err) {
+  console.log('Read Error!');
+  console.log(err);
 }
 
+function write(uid) {
+  data = {
+    pixels: compressedPixels,
+    h: colLen,
+    w: rowLen,
+    t: new Date().toGMTString()
+  }
 //Write data
+
+var path = database.ref('backers/' + str(uid));
+
 path.update(data, finished);
+}
 
 function finished(err) {
   if (err) {
-    console.log('Write Error!');
+    alert('Write Error!');
     console.log(err);
   } else {
-   console.log('Write Successful:');
-   console.log(data);
+    alert('Write Successful:');
+    console.log(data);
   }
 }
