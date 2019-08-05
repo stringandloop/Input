@@ -91,14 +91,14 @@ function createPalette() {
   createSwatch(swatch5, 'swatch5', color5);
   createSwatch(swatch6, 'swatch6', color6);
 
-  select('#swatch1').style('outline', 'solid 4px black');
+  select('#swatch1').style('box-shadow', '0 0 0 3px black');
 }
 
 function createSwatch(element, name, color) {
   element = select('#' + str(name))
   element.style('background-color', 'rgb(' + color[0] + ', ' + color[1] + ', ' + color[2] + ')');
 
-  element.style('outline', 'solid 1px lightgrey');
+  element.style('box-shadow', '0 0 0 1px lightgrey');
   //
   element.mousePressed(swatchButton(color, name));
 }
@@ -106,70 +106,59 @@ function createSwatch(element, name, color) {
 function swatchButton(color, name) {
   return function() {
     activeColor = color;
-    select('#swatch1').style('outline', 'solid 1px lightgrey');
-    select('#swatch2').style('outline', 'solid 1px lightgrey');
-    select('#swatch3').style('outline', 'solid 1px lightgrey');
-    select('#swatch4').style('outline', 'solid 1px lightgrey');
-    select('#swatch5').style('outline', 'solid 1px lightgrey');
-    select('#swatch6').style('outline', 'solid 1px lightgrey');
+    select('#swatch1').style('box-shadow', '0 0 0 1px lightgrey');
+    select('#swatch2').style('box-shadow', '0 0 0 1px lightgrey');
+    select('#swatch3').style('box-shadow', '0 0 0 1px lightgrey');
+    select('#swatch4').style('box-shadow', '0 0 0 1px lightgrey');
+    select('#swatch5').style('box-shadow', '0 0 0 1px lightgrey');
+    select('#swatch6').style('box-shadow', '0 0 0 1px lightgrey');
 
     if ((color[0] + color[1] + color[2]) / 3 > 50) {
-      select('#' + str(name)).style('outline', 'solid 4px black');
+      select('#' + str(name)).style('box-shadow', '0 0 0 3px black');
     } else {
-      select('#' + str(name)).style('outline', 'solid 4px grey');
+      select('#' + str(name)).style('box-shadow', '0 0 0 3px grey');
     }
   }
 }
 
 function brushButtons() {
-  select('#plus-button').addClass('brush-size-on');
-  select('#plus-button').mousePressed(plus);
-  select('#minus-button').addClass('brush-size-on');
-  select('#minus-button').mousePressed(minus);
-}
+  select('#brush1').mousePressed(brush1);
+  select('#brush2').mousePressed(brush2);
+  select('#brush3').mousePressed(brush3);
+  select('#brush4').mousePressed(brush4);
 
+  function resetBrushes() {
+    select('#brush1').html('1️⃣');
+    select('#brush2').html('2️⃣')
+    select('#brush3').html('3️⃣')
+    select('#brush4').html('4️⃣')
+  }
 
-function minus() {
-  if (brushSize == 4) {
-    brushSize = 3;
-    select('#plus-button').addClass('brush-size-on');
-    select('#plus-button').style('opacity: 1;');
-    select('#minus-button').addClass('brush-size-on');
-    select('#minus-button').style('opacity: 1;');
-  } else if (brushSize == 3) {
-    brushSize = 2;
-    select('#plus-button').addClass('brush-size-on');
-    select('#plus-button').style('opacity: 1;');
-    select('#minus-button').addClass('brush-size-on');
-    select('#minus-button').style('opacity: 1;');
-  } else if (brushSize == 2) {
+  function brush1() {
     brushSize = 1;
-    select('#plus-button').style('opacity: 1;');
-    select('#minus-button').removeClass('brush-size-on');
-    select('#minus-button').style('opacity: .15;');
+    resetBrushes();
+    select('#brush1').html('*️⃣');
+  }
+
+  function brush2() {
+    brushSize = 2;
+    resetBrushes();
+    select('#brush2').html('*️⃣');
+  }
+
+  function brush3() {
+    brushSize = 3;
+    resetBrushes();
+    select('#brush3').html('*️⃣');
+  }
+
+  function brush4() {
+    brushSize = 4;
+    resetBrushes();
+    select('#brush4').html('*️⃣');
   }
 }
 
-function plus() {
-  if (brushSize == 1) {
-    brushSize = 2;
-    select('#plus-button').addClass('brush-size-on');
-    select('#plus-button').style('opacity: 1;');
-    select('#minus-button').addClass('brush-size-on');
-    select('#minus-button').style('opacity: 1;');
-  } else if (brushSize == 2) {
-    brushSize = 3;
-    select('#plus-button').addClass('brush-size-on');
-    select('#plus-button').style('opacity: 1;');
-    select('#minus-button').addClass('brush-size-on');
-    select('#minus-button').style('opacity: 1;');
-  } else if (brushSize == 3) {
-    brushSize = 4;
-    select('#plus-button').removeClass('.brush-size-on');
-    select('#plus-button').style('opacity: .15;');
-    select('#minus-button').style('opacity: 1;');
-  }
-}
 
 function floodFill() {
   if (gridCheck) {

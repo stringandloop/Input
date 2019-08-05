@@ -2,31 +2,37 @@
 
 <head>
   <!-- The core Firebase JS SDK is always required and must be listed first -->
-<script src="https://www.gstatic.com/firebasejs/6.3.3/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.3.3/firebase-app.js"></script>
 
-<!-- TODO: Add SDKs for Firebase products that you want to use
+  <!-- TODO: Add SDKs for Firebase products that you want to use
      https://firebase.google.com/docs/web/setup#config-web-app -->
 
-<script src="https://www.gstatic.com/firebasejs/6.3.3/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.3.3/firebase-database.js"></script>
 
   <script>
-  // Your web app's Firebase configuration
-  var firebaseConfig = {
-    apiKey: "AIzaSyChytjaeKiLiVtBktnM5lNrnI-HsnlSY9U",
-    authDomain: "stringandloop-input.firebaseapp.com",
-    databaseURL: "https://stringandloop-input.firebaseio.com",
-    projectId: "stringandloop-input",
-    storageBucket: "stringandloop-input.appspot.com",
-    messagingSenderId: "922401397348",
-    appId: "1:922401397348:web:157a4b8b928a2b1e"
-  };
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyChytjaeKiLiVtBktnM5lNrnI-HsnlSY9U",
+      authDomain: "stringandloop-input.firebaseapp.com",
+      databaseURL: "https://stringandloop-input.firebaseio.com",
+      projectId: "stringandloop-input",
+      storageBucket: "stringandloop-input.appspot.com",
+      messagingSenderId: "922401397348",
+      appId: "1:922401397348:web:157a4b8b928a2b1e"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
   </script>
 
   <style>
-  canvas {border: 5px solid black}
+    canvas {
+      border: 5px solid black;
+    }
+
+    #preview {
+      width: fit-content;
+      margin: auto;
+    }
   </style>
 
   <title>My Sketch</title>
@@ -40,7 +46,7 @@
   <link rel="shortcut icon" type="image/x-icon" href="https://static1.squarespace.com/static/5829fe748419c24bb271b76f/t/583a1e51e4fcb5b7cf3936e8/favicon.ico">
 </head>
 
-<body>
+<body style="max-width: 720px; display: block; margin: auto;">
 
   <div id="preview" class='hidden'>
     <!-- Our preview will go here! -->

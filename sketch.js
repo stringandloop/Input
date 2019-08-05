@@ -3,13 +3,22 @@ let pixels = [];
 let compressedPixels = '';
 let visit = [];
 let count = 0;
-let tool = 1; //standard brush
+
+
+let tool = 0;
+const myBrush = 0;
+const myLine = 1;
+const myFill = 2;
+
+let dither = false;
+let mirrorX = false;
+let mirrorY = false;
+
 
 let cellW, cellH;
 let startX, startY;
 
 let preview = false;
-let dither = false;
 
 let color1, color2, color3, color4, color5, color6, bg;
 
@@ -60,7 +69,6 @@ function setup() {
 
   sketchListeners();
   select('#sketch-holder').style('padding-top: 0%;')
-
   createPalette();
   createUsername();
   brushButtons();
@@ -91,20 +99,34 @@ function draw() {
   //let cellX = floor(map(mouseX + pushCursorX, 0, cellW * rowLen, 0, rowLen));
   //let cellY = floor(map(mouseY + pushCursorY, 0, cellH * colLen, 0, colLen));
 
-  if (mouseIsPressed && gridCheck() && (tool == 1 || tool == 3)) {
-    brushTool(cellX, cellY, pushCursorX, pushCursorY);
-  }
-
-  // run 2x with inversed x values to mirror the brush
-  if (mouseIsPressed && gridCheck() && tool == 3) {
-    mirrorTool(cellX, cellY, pushCursorX, pushCursorY);
-  }
-
   drawPixels();
 
-  if (mouseIsPressed && gridCheck() && startX && startY && tool == 2) {
+  if (mouseIsPressed && gridCheck()) {
 
-    lineTool(cellX, cellY, startX, startY, pushCursorX, pushCursorY, preview);
+    if (tool == myBrush) {
+      brushTool(cellX, cellY, pushCursorX, pushCursorY);
+
+      if (mirrorX == true) {
+        brushTool(cellX, cellY, pushCursorX, pushCursorY, 'x');
+      }
+      if (mirrorY == true) {
+        brushTool(cellX, cellY, pushCursorX, pushCursorY, 'y');
+      }
+      if (mirrorX == true && mirrorY == true) {
+        brushTool(cellX, cellY, pushCursorX, pushCursorY, 'x', 'y');
+      }
+    }
+
+    if (tool == myLine && startX && startY) {
+      mirrorX = false;
+      mirrorY = false;
+      dither = false;
+      lineTool(cellX, cellY, startX, startY, pushCursorX, pushCursorY, preview);
+    }
+
+    if (tool == myFill) {
+      floodFill();
+    }
   }
 
   fill(255, 100);
@@ -126,20 +148,18 @@ function draw() {
     } else {
       fill(200, 100);
     }
-    if (brushSize == 1) {
-      //fill(red(activeColor), green(activeColor), blue(activeColor), 150);
-      // rect(mouseX - cellW * .5, mouseY - cellH * .5, cellW, cellH);
-      rect(cellX * cellW, cellY * cellH, cellW, cellH);
-    } else if (brushSize == 2) {
-      // rect(mouseX - cellW * 1.5, mouseY - cellH * 1.5, cellW * 2, cellH * 2);
-      rect((cellX - 1) * cellW, (cellY - 1) * cellH, cellW * 2, cellH * 2);
-    } else if (brushSize == 3) {
-      // rect(mouseX - cellW * 1.5, mouseY - cellH * 1.5, cellW * 2, cellH * 2);
-      rect((cellX - 1) * cellW, (cellY - 2) * cellH, cellW * 2, cellH * 3);
-    } else if (brushSize == 4) {
-      //rect(mouseX - cellW * 1.5, mouseY - cellH * 1.5, cellW * 3, cellH * 4);
-      rect((cellX - 1) * cellW, (cellY - 1) * cellH, cellW * 3, cellH * 4);
+
+    placeCursor(cellX, cellY);
+    if (mirrorX == true) {
+      placeCursor(rowLen - cellX, cellY);
     }
+    if (mirrorY == true) {
+      placeCursor(cellX, colLen - cellY);
+    }
+    if (mirrorY == true && mirrorY == true) {
+      placeCursor(rowLen - cellX, colLen - cellY);
+    }
+
   }
 
   noStroke();
@@ -169,26 +189,27 @@ function canvasPressed() {
   pmouseX = mouseX;
   pmouseY = mouseY;
 
-  if (mouseIsPressed) {
+  if (mouseIsPressed && tool == myLine) {
     preview = true;
     startX = mouseX;
     startY = mouseY;
   }
-
-
-
   loop();
 }
 
 
 function canvasReleased() {
   preview = false;
-  redraw();
-
+  redraw(); // redraw and save pixels now that preview = false
   startX = null;
   startY = null;
   sendImage();
   localStorage.setItem("pixels", JSON.stringify(compress(pixels)));
+  // redraw one more time since the canvas likes to freak out a bit
+  // after everything before. draw one more time to smooth it out and settle
+  // into the appearance once noLoop is invoked.
+
+  redraw();
   noLoop();
 }
 
@@ -199,7 +220,7 @@ function cursorMoved() {
   // mouseX and mouseY only update on the drawing cycle so the same method
   // used for mouse interactions with canvasPressed will not work.
 
-  if (preview == false) {
+  if (preview == false && tool == myLine) {
     startX = mouseX;
     startY = mouseY;
     preview = true;
@@ -222,7 +243,7 @@ function drawPixels() {
 
 
 function drawGrid() {
-  stroke(255, 100);
+  stroke(225, 100);
   for (let i = 0; i <= rowLen; i++) {
     line(i * cellW, 0, i * cellW, height);
   }
@@ -230,40 +251,13 @@ function drawGrid() {
   for (let i = 0; i <= colLen; i++) {
     line(0, i * cellH, width, i * cellH);
   }
+  //fill in edge with an extra line which goes off the canvas when inside the
+  //for loop
   line(0, height - 1, width, height - 1);
   noStroke();
 }
 
-function placePixel(x, y) {
 
-  if (x >= 0 && x < rowLen && y >= 0 && y < colLen) {
-    if (dither == false) {
-      if (preview == false || tool == 1 || tool == 3) {
-        pixels[index(x, y)] = [activeColor[0], activeColor[1], activeColor[2]];
-      } else {
-        fill(activeColor);
-        rect(x * cellW, y * cellH, cellW, cellH);
-      }
-    } else if (dither == true) {
-      if (x % 2 == 0 && (y % 4 == 0 || y % 4 == 1)) {
-        if (preview == false || tool == 1 || tool == 3) {
-          pixels[index(x, y)] = [activeColor[0], activeColor[1], activeColor[2]];
-        } else {
-          fill(activeColor);
-          rect(x * cellW, y * cellH, cellW, cellH);
-        }
-      }
-      if (x % 2 == 1 && (y % 4 == 2 || y % 4 == 3)) {
-        if (preview == false) {
-          pixels[index(x, y)] = [activeColor[0], activeColor[1], activeColor[2]];
-        } else {
-          fill(activeColor);
-          rect(x * cellW, y * cellH, cellW, cellH);
-        }
-      }
-    }
-  }
-}
 
 
 function loadSavedPixels() {
@@ -328,13 +322,26 @@ function index(x, y) {
   return (rowLen * y + x);
 }
 
-function keyPressed() {
-  floodFill();
-}
-
 function gridCheck() {
   if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
     return true;
+  }
+}
+
+function placeCursor(cellX, cellY) {
+  if (brushSize == 1) {
+    //fill(red(activeColor), green(activeColor), blue(activeColor), 150);
+    // rect(mouseX - cellW * .5, mouseY - cellH * .5, cellW, cellH);
+    rect(cellX * cellW, cellY * cellH, cellW, cellH);
+  } else if (brushSize == 2) {
+    // rect(mouseX - cellW * 1.5, mouseY - cellH * 1.5, cellW * 2, cellH * 2);
+    rect((cellX - 1) * cellW, (cellY - 1) * cellH, cellW * 2, cellH * 2);
+  } else if (brushSize == 3) {
+    // rect(mouseX - cellW * 1.5, mouseY - cellH * 1.5, cellW * 2, cellH * 2);
+    rect((cellX - 1) * cellW, (cellY - 2) * cellH, cellW * 2, cellH * 3);
+  } else if (brushSize == 4) {
+    //rect(mouseX - cellW * 1.5, mouseY - cellH * 1.5, cellW * 3, cellH * 4);
+    rect((cellX - 1) * cellW, (cellY - 1) * cellH, cellW * 3, cellH * 4);
   }
 }
 
@@ -344,9 +351,8 @@ function createUsername() {
       // User is signed in.
       var email_id = firebase.auth().currentUser.email;
       var uid = firebase.auth().currentUser.uid;
-      select('#header').html('Logged In As: ' + str(email_id) + ' | ' + '<a href="./login.html">Logout</a>');
-      write(uid);
-      console.log(user.displayName);
+      //write(uid);
+      select('#header').html('Logged In As: ' + str(email_id) + ' | ' + '<a href="./login.html" onclick="logout()">Logout</a>');
     } else {
       select('#header').html('<a href="./login.html">Login</a>');
     }
@@ -354,20 +360,19 @@ function createUsername() {
 }
 
 
-
 function decode(p) {
 
-  if (p == '1') {
+  if (p == 'a') {
     return color1;
-  } else if (p == '2') {
+  } else if (p == 'b') {
     return color2;
-  } else if (p == '3') {
+  } else if (p == 'c') {
     return color3;
-  } else if (p == '4') {
+  } else if (p == 'd') {
     return color4;
-  } else if (p == '5') {
+  } else if (p == 'e') {
     return color5;
-  } else if (p == '6') {
+  } else if (p == 'f') {
     return color6;
   } else {
     return bg;
@@ -376,26 +381,41 @@ function decode(p) {
 
 function encode(p) {
   if (p == '201, 33, 33') { //red
-    return '1';
+    return 'a';
   } else if (p == '33, 33, 201') { // blue
-    return '2';
+    return 'b';
   } else if (p == '255, 255, 255') { // white
-    return '3';
+    return 'c';
   } else if (p == '120, 120, 120') { // grey
-    return '4';
+    return 'd';
   } else if (p == '251, 190, 44') { // gold
-    return '5';
+    return 'e';
   } else if (p == '0, 0, 0') { // black
-    return '6';
+    return 'f';
   } else {
-    return '6';
+    return 'f';
   }
 }
 
 function compress(data) {
   let compressed = '';
+
   for (let i = 0; i < data.length; i++) {
     compressed += encode(str(data[i][0]) + ', ' + str(data[i][1]) + ', ' + str(data[i][2]));
   }
+
+  let output = '';
+  let count = 0;
+  for (let i = 0; i < compressed.length; i++) {
+    count++;
+    if (compressed.charAt(i) != compressed.charAt(i)) {
+      output += compressed.charAt(i) + str(count);
+      count = 0;
+    }
+  }
   return compressed;
+}
+
+function logout() {
+  firebase.auth().signOut();
 }

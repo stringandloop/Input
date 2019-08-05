@@ -29,22 +29,23 @@ function setup() {
   makeImages();
 
 
-  path.once("value")
-    .then(function(snapshot) {
-        snapshot.forEach(function(childSnapshot) {
-          let pixels = childSnapshot.val().pixels;
-          let plot = childSnapshot.val().plot;
-          if (pixels && plot) {
-            drawImage(pixels, plot);
-          }
-        });
-      },
+  path.once("value", function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+        let pixels = childSnapshot.val().pixels;
+        let plot = childSnapshot.val().plot;
+        if (pixels && plot > -1 && plot < 56) {
+          drawImage(pixels, plot);
+        } else {
 
-      function(error) {
-        alert(error);
+        }
       });
+    },
 
-  let canvas = createCanvas(400, 800);
+    function(error) {
+      alert(error);
+    });
+
+  let canvas = createCanvas(300, 600);
   canvas.parent('preview');
   background(0);
 }
@@ -74,7 +75,6 @@ function drawImage(pixels, plot) {
   }
 }
 
-
 function errData(err) {
   console.log('Read Error!');
   console.log(err);
@@ -88,23 +88,28 @@ function index(x, y) {
 
 function decode(p) {
 
-  if (p == '1') {
+  if (p == 'a') {
     return color1;
-  } else if (p == '2') {
+  } else if (p == 'b') {
     return color2;
-  } else if (p == '3') {
+  } else if (p == 'c') {
     return color3;
-  } else if (p == '4') {
+  } else if (p == 'd') {
     return color4;
-  } else if (p == '5') {
+  } else if (p == 'e') {
     return color5;
-  } else if (p == '6') {
+  } else if (p == 'f') {
     return color6;
   } else {
     return bg;
   }
 }
 
+
+function windowResized() {
+  sketch = document.getElementById('preview')
+  //resizeCanvas(200, 400);
+}
 
 
 function makeImages() {

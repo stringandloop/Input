@@ -34,53 +34,61 @@
   <link rel="shortcut icon" type="image/x-icon" href="https://static1.squarespace.com/static/5829fe748419c24bb271b76f/t/583a1e51e4fcb5b7cf3936e8/favicon.ico">
 </head>
 
-<body style="max-width: 720px; display: block; margin: auto;">
-    <div id="header">
-    </div>
-    <div id="modal">
-      <div id="modal-inner">
-        <div id="modal-center">
-          <div id="input-title">
-            <h2>Upload your drawing to string&&loop's servers;</h2>
-          </div><br>
-          <input id="input-author" class="input-container form-item" type="text" name="unnamed" placeholder="Author" style="width: 60%;" required><br>
-          <input id="input-id" class="input-container form-item" type="text" name="id" placeholder="ID" style="width: 60%;"><br>
-          <div id="terms-conditions"><input id="input-checkbox" type="checkbox">I accept the terms and conditions<br></div>
-          <div id="submit-button" type="submit" value="Sign Up" style="display: inline-block;"><span class="submit-form-label sqs-system-button sqs-editable-button">Submit</span></div>
-        </div>
+<body style="max-width: 720px; display: block; margin: auto; padding: 20px;">
+  <div id="header">
+  </div>
+  <div id="modal">
+    <div id="modal-inner">
+      <div id="modal-center">
+        <div id="input-title">
+          <h2>Upload your drawing to string&&loop's servers;</h2>
+        </div><br>
+        <input id="input-author" class="input-container form-item" type="text" name="unnamed" placeholder="Author" style="width: 60%;" required><br>
+        <input id="input-id" class="input-container form-item" type="text" name="id" placeholder="ID" style="width: 60%;"><br>
+        <div id="terms-conditions"><input id="input-checkbox" type="checkbox">I accept the terms and conditions<br></div>
+        <div id="submit-button" type="submit" value="Sign Up" style="display: inline-block;"><span class="submit-form-label sqs-system-button sqs-editable-button">Submit</span></div>
       </div>
     </div>
-    <div id="left-side">
-      <div id='control-holder'>
-        <div id="undo-button" class='control'>↩️&#8201;Undo</div>
-        <div id="clear-button" class='control'>❌&#8201;Clear</div>
-        <div id="save-button" class='control'>💾&#8201;Save</div>
-      </div>
-      <div id="sketch-border">
-        <div id="sketch-holder">
-          <!-- Our sketch will go here! -->
-        </div>
-
-      </div>
-      <div id=bottom-row>
-        <div id="swatch-holder">
-          <div id="swatch1" class="swatch"></div>
-          <div id="swatch2" class="swatch"></div>
-          <div id="swatch3" class="swatch"></div>
-          <div id="swatch4" class="swatch"></div>
-          <div id="swatch5" class="swatch"></div>
-          <div id="swatch6" class="swatch"></div>
-        </div>
-        <div id="brush-size-holder">
-          <div id="minus-button" class="brush-size">-</div>
-          <div id="plus-button" class="brush-size">+</div>
-        </div>
+  </div>
+  <div id="left-side">
+    <div class='control-holder'>
+      <a id="undo-button" class='control'>↩️&#8201;Undo</a>
+      <a id="clear-button" class='control'>❌&#8201;Clear</a>
+      <a id="save-button" class='control'>💾&#8201;Save</a>
+    </div>
+    <div id="sketch-border">
+      <div id="sketch-holder">
+        <!-- Our sketch will go here! -->
       </div>
     </div>
-    <div id="right-side">
-      <div id="preview-image"></div>
-      <img id="sock-image" src="https://static1.squarespace.com/static/5829fe748419c24bb271b76f/t/5d3696d84515900001276cf2/1563858648777/input.jpg">
+    <div id=bottom-row>
+        <a id="swatch1" class="swatch"></a>
+        <a id="swatch2" class="swatch"></a>
+        <a id="swatch3" class="swatch"></a>
+        <a id="swatch4" class="swatch"></a>
+        <a id="swatch5" class="swatch"></a>
+        <a id="swatch6" class="swatch"></a>
+        <a id="brush1" class="brush-size">1️⃣</a>
+        <a id="brush2" class="brush-size">️2️⃣</a>
+        <a id="brush3" class="brush-size">3️⃣</a>
+        <a id="brush4" class="brush-size">4️⃣</a>
+  </div>
+  <br>
+    <div class='control-holder'>
+      <a id="pencil-button" class='tool'>✏️&#8201;Pencil</a>
+      <a id="line-button" class='tool'>📏&#8201;Line</a>
+      <a id="fill-button" class='tool'>🚰&#8201;Fill</a>
     </div>
+    <div class='control-holder'>
+      <a id="dither-button" class='modifier'>🏁&#8201;Dither</a>
+      <a id="mirrorx-button" class='modifier'>👯&#8201;MirrorX</a>
+      <a id="mirrory-button" class='modifier'>🙃&#8201;MirrorY</a>
+    </div>
+  </div>
+  <div id="right-side">
+    <div id="preview-image"></div>
+    <img id="sock-image" src="https://static1.squarespace.com/static/5829fe748419c24bb271b76f/t/5d3696d84515900001276cf2/1563858648777/input.jpg">
+  </div>
 </body>
 
 </html>
