@@ -19,9 +19,9 @@ function saveGrid() {
 function sendImage() {
   background(bg);
   drawPixels();
-  let a = canvas.toDataURL("image/png");
+  let a = canvas.toDataURL("image/jpeg");
   select('#preview-image').style('background-image', 'url("' + str(a) + '")');
-  drawGrid();
+  drawGrid(showGrid);
 }
 
 

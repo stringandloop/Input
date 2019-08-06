@@ -1,5 +1,5 @@
-let rowLen = 24; // cells
-let colLen = 34; // cells
+let rowLen = 28; // cells
+let colLen = 40; // cells
 
 let p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
 let p10, p11, p12, p13, p14, p15, p16, p17, p18, p19;
@@ -9,7 +9,7 @@ let p40, p41, p42, p43, p44, p45, p46, p47, p48, p49;
 let p50, p51, p52, p53, p54, p55, p56, p57, p58, p59;
 
 let previewArray = [];
-let plotsTaken = [];
+let plotsDrawn = [];
 
 let color1, color2, color3, color4, color5, color6, bg;
 
@@ -29,21 +29,39 @@ function setup() {
   makeImages();
 
 
-  path.once("value", function(snapshot) {
-      snapshot.forEach(function(childSnapshot) {
-        let pixels = childSnapshot.val().pixels;
-        let plot = childSnapshot.val().plot;
-        if (pixels && plot > -1 && plot < 56) {
-          drawImage(pixels, plot);
-        } else {
 
-        }
-      });
-    },
 
-    function(error) {
-      alert(error);
-    });
+  path.on('child_added', function(data) {
+    // get the value of the current plot and updated pixels
+    let pixels = data.val().pixels;
+    let plot = data.val().plot;
+    // validate pixels and plot location
+    if (pixels && plot > -1 && heelCheck(plot) == true && plot < 60) {
+      // store the value of the plot and pixels that have been drawn in a dictionary
+      plotsDrawn[data.key] = plot;
+      //draw the new image
+      drawImage(plot, pixels);
+      redraw();
+    }
+  });
+
+  path.on('child_changed', function(data) {
+    // get the value of the current plot and updated pixels
+    let pixels = data.val().pixels;
+    let plot = data.val().plot;
+    // validate pixels and plot location
+    if (pixels && plot > -1 && heelCheck(plot) == true && plot < 60) {
+      // reset the plot that was drawn previously
+      clearImage(plotsDrawn[data.key]);
+      // update the record with the plot that the user now owns
+      plotsDrawn[data.key] = plot;
+      //draw the new image
+
+      drawImage(plot, pixels);
+      redraw();
+    }
+  });
+
 
   let canvas = createCanvas(300, 600);
   canvas.parent('preview');
@@ -53,17 +71,16 @@ function setup() {
 function draw() {
   background(0);
   for (let i = 0; i < previewArray.length; i++) {
-    let padding = (width / 168 * 3)
     let x = (i % 6) * (width / 6);
     let y = floor(i / 6) * (height / 10);
     let w = width / 6;
-    image(previewArray[i], x + w / 2, y + w / 2, w - padding, w - padding);
+    image(previewArray[i], x + w / 2, y + w / 2, w, w);
   }
   noLoop();
 }
 
 
-function drawImage(pixels, plot) {
+function drawImage(plot, pixels) {
   for (let i = 0; i < rowLen; i++) {
     for (let j = 0; j < colLen; j++) {
       let pixel = pixels.charAt(index(i, j));
@@ -71,7 +88,23 @@ function drawImage(pixels, plot) {
       previewArray[plot].fill(fill);
       previewArray[plot].rect(i * 7, j * 5, 7, 5);
     }
-    redraw();
+  }
+}
+
+
+function clearImage(plot) {
+  previewArray[plot].background(bg);
+  previewArray[plot].noStroke();
+  previewArray[plot].textAlign(CENTER);
+  previewArray[plot].fill(255);
+  previewArray[plot].textSize(32);
+
+  if (plot == 30 || plot == 31 || plot == 34 || plot == 35) {
+    previewArray[plot].fill(255, 0, 0);
+    previewArray[plot].text('Heel', previewArray[plot].width / 2, previewArray[plot].height / 2 + 16);
+    previewArray[plot].fill(255);
+  } else {
+    previewArray[plot].text('Plot ' + plot, previewArray[plot].width / 2, previewArray[plot].height / 2 + 16);
   }
 }
 
@@ -109,6 +142,13 @@ function decode(p) {
 function windowResized() {
   sketch = document.getElementById('preview')
   //resizeCanvas(200, 400);
+}
+
+function heelCheck(plot) {
+  if (plot == 30 || plot == 31 || plot == 34 || plot == 35) {
+    return false;
+  }
+  return true;
 }
 
 
@@ -182,17 +222,6 @@ function makeImages() {
   previewArray = [p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22, p23, p24, p25, p26, p27, p28, p29, p30, p31, p32, p33, p34, p35, p36, p37, p38, p39, p40, p41, p42, p43, p44, p45, p46, p47, p48, p49, p50, p51, p52, p53, p54, p55, p56, p57, p58, p59];
 
   for (let i = 0; i < previewArray.length; i++) {
-    previewArray[i].noStroke();
-    previewArray[i].textAlign(CENTER);
-    previewArray[i].fill(255);
-    previewArray[i].textSize(32);
-
-    if (i == 30 || i == 31 || i == 34 || i == 35) {
-      previewArray[i].fill(255, 0, 0);
-      previewArray[i].text('Heel', previewArray[i].width / 2, previewArray[i].height / 2 + 16);
-      previewArray[i].fill(255);
-    } else {
-      previewArray[i].text('Plot ' + i, previewArray[i].width / 2, previewArray[i].height / 2 + 16);
-    }
+    clearImage(i);
   }
 }

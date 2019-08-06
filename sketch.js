@@ -13,6 +13,7 @@ const myFill = 2;
 let dither = false;
 let mirrorX = false;
 let mirrorY = false;
+let showGrid = true;
 
 
 let cellW, cellH;
@@ -26,8 +27,8 @@ let undoState = 0;
 let maxUndo = 100;
 let savedGrids = [];
 
-let rowLen = 24; // cells
-let colLen = 34; // cells
+let rowLen = 28; // cells
+let colLen = 40; // cells
 
 let brushSize = 2;
 let activeColor;
@@ -164,7 +165,7 @@ function draw() {
 
   noStroke();
 
-  drawGrid();
+  drawGrid(showGrid);
 
   // Invoiking loop results in smoother framerate than using redraw
   // with mouse move.
@@ -242,19 +243,26 @@ function drawPixels() {
 }
 
 
-function drawGrid() {
-  stroke(225, 100);
-  for (let i = 0; i <= rowLen; i++) {
-    line(i * cellW, 0, i * cellW, height);
-  }
+function drawGrid(grid) {
+  if (grid == true) {
+    stroke(225, 100);
+    noFill();
+    for (let i = 0; i <= rowLen; i++) {
+      line(i * cellW, 0, i * cellW, height);
+    }
 
-  for (let i = 0; i <= colLen; i++) {
-    line(0, i * cellH, width, i * cellH);
+    for (let i = 0; i <= colLen; i++) {
+      line(0, i * cellH, width, i * cellH);
+    }
+    //fill in edge with an extra line which goes off the canvas when inside the
+    //for loop
+    line(0, height - 1, width, height - 1);
+    strokeWeight(2);
+    stroke(60, 255, 255, 100);
+    rect(cellW * 2, cellH * 3, width - cellW * 4, height - cellH * 6);
+    strokeWeight(1);
+    noStroke();
   }
-  //fill in edge with an extra line which goes off the canvas when inside the
-  //for loop
-  line(0, height - 1, width, height - 1);
-  noStroke();
 }
 
 
@@ -267,21 +275,20 @@ function loadSavedPixels() {
 
   if (localStorage.getItem("pixels")) {
     let storedPixels = JSON.parse(localStorage.getItem("pixels"));
-    if (storedPixels.length == pixels.length) {
-      for (let i = 0; i < pixels.length; i++) {
-        let r = decode(storedPixels.charAt(i))[0];
-        let g = decode(storedPixels.charAt(i))[1];
-        let b = decode(storedPixels.charAt(i))[2];
-        let pixelColor = [r, g, b];
-        pixels[i] = pixelColor;
-        compressedPixels += storedPixels.charAt(i);
-      }
-    } else {
-      // clear old data if it's not compatible
-      removeItem('pixels');
+    //if (storedPixels.length == pixels.length) {
+    for (let i = 0; i < pixels.length; i++) {
+      let r = decode(storedPixels.charAt(i))[0];
+      let g = decode(storedPixels.charAt(i))[1];
+      let b = decode(storedPixels.charAt(i))[2];
+      let pixelColor = [r, g, b];
+      pixels[i] = pixelColor;
+      compressedPixels += storedPixels.charAt(i);
     }
-    sendImage();
+  } else {
+    //clear old data if it 's not compatible
+    removeItem('pixels');
   }
+  sendImage();
 }
 
 function cursorOn() {
@@ -398,23 +405,46 @@ function encode(p) {
 }
 
 function compress(data) {
-  let compressed = '';
+  //initialize strings
+  let firstPass = '';
+  let result = '';
 
+  //First pass encoding: From pixel arrays to individual characters
   for (let i = 0; i < data.length; i++) {
-    compressed += encode(str(data[i][0]) + ', ' + str(data[i][1]) + ', ' + str(data[i][2]));
+    firstPass += encode(str(data[i][0]) + ', ' + str(data[i][1]) + ', ' + str(data[i][2]));
   }
+  //  print(firstPass);
 
-  let output = '';
+  //second pass encoding: collapsing repeat pixels
   let count = 0;
-  for (let i = 0; i < compressed.length; i++) {
+  for (let i = 0; i < firstPass.length; i++) {
     count++;
-    if (compressed.charAt(i) != compressed.charAt(i)) {
-      output += compressed.charAt(i) + str(count);
+    if (firstPass.charAt(i) != firstPass.charAt(i + 1)) {
+      result += firstPass.charAt(i) + str(count);
       count = 0;
     }
   }
-  return compressed;
+  //decompress(result);
+  return firstPass;
 }
+
+
+// function decompress(data) {
+//   //initialize string
+//   let result = '';
+//   for (let i = 0; i < data.length; i++) {
+//
+//     if (isNaN(i)) {
+//       let multiplier = 1;
+//       if (isNaN(i+multiplier)) {
+//         multiplier ++;
+//       }
+//       for (let j = 0; j < data.charAt(i + 1); j++) {
+//         result += data.charAt(i);
+//       }
+//     }
+//   }
+// }
 
 function logout() {
   firebase.auth().signOut();
