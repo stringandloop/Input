@@ -274,15 +274,20 @@ function loadSavedPixels() {
   }
 
   if (localStorage.getItem("pixels")) {
+    // if pixels exist in storage, retrieve and parse them
     let storedPixels = JSON.parse(localStorage.getItem("pixels"));
-    //if (storedPixels.length == pixels.length) {
-    for (let i = 0; i < pixels.length; i++) {
-      let r = decode(storedPixels.charAt(i))[0];
-      let g = decode(storedPixels.charAt(i))[1];
-      let b = decode(storedPixels.charAt(i))[2];
-      let pixelColor = [r, g, b];
-      pixels[i] = pixelColor;
-      compressedPixels += storedPixels.charAt(i);
+    // pass the condensed version over to the database
+    compressedPixels = storedPixels;
+    // expand the string and begin assigning values to the larger array
+    storedPixels = decompress(storedPixels);
+    if (storedPixels.length == pixels.length) {
+      for (let i = 0; i < pixels.length; i++) {
+        let r = decode(storedPixels.charAt(i))[0];
+        let g = decode(storedPixels.charAt(i))[1];
+        let b = decode(storedPixels.charAt(i))[2];
+        let pixelColor = [r, g, b];
+        pixels[i] = pixelColor;
+      }
     }
   } else {
     //clear old data if it 's not compatible
@@ -352,6 +357,7 @@ function placeCursor(cellX, cellY) {
   }
 }
 
+
 function createUsername() {
   firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
@@ -367,85 +373,25 @@ function createUsername() {
 }
 
 
-function decode(p) {
-
-  if (p == 'a') {
-    return color1;
-  } else if (p == 'b') {
-    return color2;
-  } else if (p == 'c') {
-    return color3;
-  } else if (p == 'd') {
-    return color4;
-  } else if (p == 'e') {
-    return color5;
-  } else if (p == 'f') {
-    return color6;
-  } else {
-    return bg;
-  }
-}
-
-function encode(p) {
-  if (p == '201, 33, 33') { //red
-    return 'a';
-  } else if (p == '33, 33, 201') { // blue
-    return 'b';
-  } else if (p == '255, 255, 255') { // white
-    return 'c';
-  } else if (p == '120, 120, 120') { // grey
-    return 'd';
-  } else if (p == '251, 190, 44') { // gold
-    return 'e';
-  } else if (p == '0, 0, 0') { // black
-    return 'f';
-  } else {
-    return 'f';
-  }
-}
-
-function compress(data) {
-  //initialize strings
-  let firstPass = '';
-  let result = '';
-
-  //First pass encoding: From pixel arrays to individual characters
-  for (let i = 0; i < data.length; i++) {
-    firstPass += encode(str(data[i][0]) + ', ' + str(data[i][1]) + ', ' + str(data[i][2]));
-  }
-  //  print(firstPass);
-
-  //second pass encoding: collapsing repeat pixels
-  let count = 0;
-  for (let i = 0; i < firstPass.length; i++) {
-    count++;
-    if (firstPass.charAt(i) != firstPass.charAt(i + 1)) {
-      result += firstPass.charAt(i) + str(count);
-      count = 0;
-    }
-  }
-  //decompress(result);
-  return firstPass;
-}
-
-
-// function decompress(data) {
-//   //initialize string
-//   let result = '';
-//   for (let i = 0; i < data.length; i++) {
-//
-//     if (isNaN(i)) {
-//       let multiplier = 1;
-//       if (isNaN(i+multiplier)) {
-//         multiplier ++;
-//       }
-//       for (let j = 0; j < data.charAt(i + 1); j++) {
-//         result += data.charAt(i);
-//       }
-//     }
-//   }
-// }
-
 function logout() {
   firebase.auth().signOut();
 }
+
+
+// // IF user is logged in get their saved pixels and update their drawing to match
+// // what we have
+// var path = database.ref('backers/' + uid);
+// path.once('value', function(data) {
+//     // get the value of the current plot and updated pixels
+//     let storedPixels = decompress(data.val().pixels);
+//     print(storedPixels);
+//     if (storedPixels.length == pixels.length) {
+//       for (let i = 0; i < pixels.length; i++) {
+//         let r = decode(storedPixels.charAt(i))[0];
+//         let g = decode(storedPixels.charAt(i))[1];
+//         let b = decode(storedPixels.charAt(i))[2];
+//         let pixelColor = [r, g, b];
+//         pixels[i] = pixelColor;
+//       }
+//     }
+//   });

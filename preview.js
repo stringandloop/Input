@@ -30,10 +30,10 @@ function setup() {
 
 
 
-
   path.on('child_added', function(data) {
     // get the value of the current plot and updated pixels
     let pixels = data.val().pixels;
+    pixels = decompress(pixels);
     let plot = data.val().plot;
     // validate pixels and plot location
     if (pixels && plot > -1 && heelCheck(plot) == true && plot < 60) {
@@ -48,6 +48,7 @@ function setup() {
   path.on('child_changed', function(data) {
     // get the value of the current plot and updated pixels
     let pixels = data.val().pixels;
+    pixels = decompress(pixels);
     let plot = data.val().plot;
     // validate pixels and plot location
     if (pixels && plot > -1 && heelCheck(plot) == true && plot < 60) {
@@ -119,26 +120,6 @@ function index(x, y) {
 }
 
 
-function decode(p) {
-
-  if (p == 'a') {
-    return color1;
-  } else if (p == 'b') {
-    return color2;
-  } else if (p == 'c') {
-    return color3;
-  } else if (p == 'd') {
-    return color4;
-  } else if (p == 'e') {
-    return color5;
-  } else if (p == 'f') {
-    return color6;
-  } else {
-    return bg;
-  }
-}
-
-
 function windowResized() {
   sketch = document.getElementById('preview')
   //resizeCanvas(200, 400);
@@ -150,6 +131,8 @@ function heelCheck(plot) {
   }
   return true;
 }
+
+
 
 
 function makeImages() {
