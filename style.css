@@ -2,11 +2,23 @@ body {
   font-family: 'Source Sans Pro', sans-serif;
 }
 
+canvas{
+  border: 1px solid darkgrey;
+}
+
+#header{
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
 #left-side {
   margin: 0;
   padding: 0;
   font-family: 'Source Code Pro', monospace;
   color: black;
+  background-color: lightgrey;
+  border-radius: 5px;
+  box-shadow: 0px 15px 30px rgba(0, 0, 0, .4) !important;
 }
 
 #modal {
@@ -85,13 +97,6 @@ body {
   height: 100%;
 }
 
-#swatch-holder {
-  width: 100%;
-  padding: 0px;
-  display: flex;
-  margin-right: auto;
-}
-
 .swatch {
   display: inline-block;
   margin-right: 3%;
@@ -137,28 +142,43 @@ body {
   width: 108%;
   position: relative;
   margin-top: 8%;
+  z-index: -1;
 }
+
 
 .control-holder {
-  display: flex;
-  width: 100%;
-}
-
-.control {
   /* background-color: red; */
-  padding: 10px;
-  font-size: 18px;
+  display: flex;
+  padding-left: 20px;
+  padding-right: 20px;
+  font-size: 14px;
   cursor: pointer;
 }
 
-#clear-button {
+#menu-holder{
+  margin-top: 20px;
+  display: flex;
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-bottom: 20px;
+}
+
+#swatch-holder{
+  margin-top: 20px;
+}
+
+#tool-holder{
+  margin-bottom: 20px;
+}
+
+.menu-button{
   margin: auto;
 }
 
-#bottom-row {
-  display: flex;
-  margin-top: 15px;
+.tool, .modifier{
+  margin: auto;
 }
+
 
 .brush-size {
   display: flex;
@@ -186,6 +206,10 @@ body {
 }
 
 #undo-button {
+  opacity: .2;
+}
+
+#load-button {
   opacity: .2;
 }
 

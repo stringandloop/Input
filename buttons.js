@@ -26,62 +26,183 @@ function sendImage() {
 
 
 function controlButtons() {
-  select('#undo-button').mousePressed(undo);
+  select('#undo-button').mousePressed(undoButton);
   select('#undo-button').style('opacity: .15;')
-  //
-  select('#save-button').mousePressed(saveButton);
-  select('#submit-button').mousePressed(submit);
-  select('#modal').mousePressed(hideModal);
-  //hideModal();
-
   select('#clear-button').mousePressed(clearButton);
+  select('#grid-button').mousePressed(gridButton);
+  select('#load-button').mousePressed(loadButton);
+  select('#save-button').mousePressed(saveButton);
+
+
+  function undoButton() {
+    if (undoState > 0) {
+      undoState = undoState - 1;
+      for (let i = 0; i < rowLen * colLen; i++) {
+        pixels[i] = savedGrids[undoState][i];
+      }
+    }
+    if (undoState == 0) {
+      select('#undo-button').removeClass('undo-on');
+      select('#undo-button').style('opacity: .15;')
+    }
+
+    sendImage();
+    localStorage.setItem("pixels", JSON.stringify(compress(pixels)));
+    redraw();
+  }
+
+  function clearButton() {
+    saveGrid();
+    for (let i = 0; i < rowLen; i++) {
+      for (let j = 0; j < colLen; j++) {
+        pixels[(rowLen * j) + i] = [bg[0], bg[1], bg[2]];
+      }
+    }
+    sendImage();
+    localStorage.setItem("pixels", JSON.stringify(compress(pixels)));
+    redraw();
+  }
+
+  function gridButton() {
+    if (showGrid == true) {
+      showGrid = false;
+    } else {
+      showGrid = true;
+    }
+    redraw();
+  }
+
+  function loadButton() {
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        var uid = firebase.auth().currentUser.uid;
+        var path = database.ref('backers/' + uid);
+        path.once('value', gotData, errData);
+
+        function gotData(data) {
+          // get the value of the current plot and updated pixels
+          let storedPixels = decompress(data.val().pixels);
+          if (storedPixels.length == pixels.length) {
+            updateLoadedPixels(storedPixels);
+            redraw();
+            sendImage();
+            alert('Successfully loaded data loaded from Server')
+            //Save the action so that it may be undone
+            saveGrid();
+            //release the canvas from drawing to debug the alert box counting as a mouse press
+            canvasReleased();
+            return;
+          }
+          alert('Sorry, your saved data is incompatible with the current canvas.')
+        }
+
+        function errData(data) {
+          alert('Sorry. Something went wrong. Could Not read data from server.')
+        }
+      }
+    });
+  }
+
+  function saveButton() {
+    for (let i = 0; i < rowLen; i++) {
+      for (let j = 0; j < colLen; j++) {
+        gridImg.noStroke();
+        gridImg.fill(pixels[index(i, j)]);
+        gridImg.stroke(pixels[index(i, j)]);
+        gridImg.rect(i * 7, j * 5, 7, 5);
+      }
+    }
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        var uid = firebase.auth().currentUser.uid;
+        write(uid);
+      } else {
+        alert('Thank you for your submission!');
+      }
+    });
+    save(gridImg, 'stringandloop-input.png');
+    saveGrid();
+    canvasReleased();
+  }
+}
+
+function toolButtons() {
+  select('#pencil-button').mousePressed(pencilButton);
+  select('#pencil-button').style('color', '#e43a4c');
+  select('#line-button').mousePressed(lineButton);
+  select('#fill-button').mousePressed(fillButton);
+
+  function pencilButton() {
+    tool = 0;
+    preview = false;
+    select('#pencil-button').style('color', '#e43a4c');
+    select('#line-button').style('color', 'black');
+    select('#fill-button').style('color', 'black');
+  }
+
+  function lineButton() {
+    tool = 1;
+    select('#pencil-button').style('color', 'black');
+    select('#line-button').style('color', '#e43a4c');
+    select('#fill-button').style('color', 'black');
+    removeModifier();
+  }
+
+  function fillButton() {
+    tool = 2;
+    select('#pencil-button').style('color', 'black');
+    select('#line-button').style('color', 'black');
+    select('#fill-button').style('color', '#e43a4c');
+    removeModifier();
+  }
+
+  function removeModifier() {
+    dither = false;
+    mirrorX = false;
+    mirrorY = false;
+    select('#dither-button').style('color', 'black');
+    select('#mirrorx-button').style('color', 'black');
+    select('#mirrory-button').style('color', 'black');
+  }
 }
 
 
-function undo() {
-  if (undoState > 0) {
-    undoState = undoState - 1;
-    for (let i = 0; i < rowLen * colLen; i++) {
-      pixels[i] = savedGrids[undoState][i];
+function modifierButtons() {
+  select('#dither-button').mousePressed(ditherButton);
+  select('#mirrorx-button').mousePressed(mirrorXButton);
+  select('#mirrory-button').mousePressed(mirrorYButton);
+
+  function ditherButton() {
+    if (dither == false && tool == 0) {
+      dither = true;
+      select('#dither-button').style('color', '#e43a4c');
+    } else {
+      dither = false;
+      select('#dither-button').style('color', 'black');
     }
   }
-  if (undoState == 0) {
-    select('#undo-button').removeClass('undo-on');
-    select('#undo-button').style('opacity: .15;')
-  }
 
-  sendImage();
-  localStorage.setItem("pixels", JSON.stringify(compress(pixels)));
-  redraw();
-}
-
-
-function clearButton() {
-  saveGrid();
-  for (let i = 0; i < rowLen; i++) {
-    for (let j = 0; j < colLen; j++) {
-      pixels[(rowLen * j) + i] = [bg[0], bg[1], bg[2]];
+  function mirrorXButton() {
+    if (mirrorX == false && tool == 0) {
+      mirrorX = true;
+      select('#mirrorx-button').style('color', '#e43a4c');
+    } else {
+      mirrorX = false;
+      select('#mirrorx-button').style('color', 'black');
     }
   }
-  sendImage();
-  localStorage.setItem("pixels", JSON.stringify(compress(pixels)));
-  redraw();
-}
 
-
-function saveButton() {
-  for (let i = 0; i < rowLen; i++) {
-    for (let j = 0; j < colLen; j++) {
-      gridImg.noStroke();
-      gridImg.fill(pixels[(rowLen * j) + i]);
-      gridImg.rect(i, j, 1, 1);
+  function mirrorYButton() {
+    if (mirrorY == false && tool == 0) {
+      mirrorY = true;
+      select('#mirrory-button').style('color', '#e43a4c');
+    } else {
+      mirrorY = false;
+      select('#mirrory-button').style('color', 'black');
     }
   }
-  modal = true;
-  print(modal);
-  select('#modal').style('display: block;');
-  select('#modal').style('opacity: 1;');;
 }
+
 
 function createPalette() {
   createSwatch(swatch1, 'swatch1', color1);
@@ -90,18 +211,17 @@ function createPalette() {
   createSwatch(swatch4, 'swatch4', color4);
   createSwatch(swatch5, 'swatch5', color5);
   createSwatch(swatch6, 'swatch6', color6);
-
   select('#swatch1').style('box-shadow', '0 0 0 3px black');
 }
+
 
 function createSwatch(element, name, color) {
   element = select('#' + str(name))
   element.style('background-color', 'rgb(' + color[0] + ', ' + color[1] + ', ' + color[2] + ')');
-
   element.style('box-shadow', '0 0 0 1px lightgrey');
-  //
   element.mousePressed(swatchButton(color, name));
 }
+
 
 function swatchButton(color, name) {
   return function() {
@@ -121,9 +241,11 @@ function swatchButton(color, name) {
   }
 }
 
+
 function brushButtons() {
   select('#brush1').mousePressed(brush1);
   select('#brush2').mousePressed(brush2);
+  select('#brush2').html('*️⃣');
   select('#brush3').mousePressed(brush3);
   select('#brush4').mousePressed(brush4);
 
@@ -160,53 +282,6 @@ function brushButtons() {
 }
 
 
-function floodFill() {
-  if (gridCheck) {
-    saveGrid();
-    //take new cellValues
-    let x = floor(map(mouseX, 0, cellW * rowLen, 0, rowLen));
-    let y = floor(map(mouseY, 0, cellH * colLen, 0, colLen));
-
-    //to compare colors check and compare the indidivual values
-    let r = pixels[index(x, y)][0];
-    let g = pixels[index(x, y)][1];
-    let b = pixels[index(x, y)][2];
-
-    let activer = activeColor[0];
-    let activeg = activeColor[1];
-    let activeb = activeColor[2];
-
-    if (str(r, g, b) != str(activer, activeg, activeb)) {
-      floodFillInner(x, y, r, g, b);
-    }
-
-    redraw();
-    localStorage.setItem("pixels", JSON.stringify(compress(pixels)));
-    sendImage();
-  }
-}
-
-function floodFillInner(x, y, r, g, b) {
-  if (x < 0 || x > rowLen - 1 || y < 0 || y > colLen - 1) {
-    return; // already go back
-  }
-
-  let r2 = pixels[index(x, y)][0];
-  let g2 = pixels[index(x, y)][1];
-  let b2 = pixels[index(x, y)][2];
-
-  if (str(r, g, b) != str(r2, g2, b2)) {
-    return;
-  }
-
-  pixels[index(x, y)] = [activeColor[0], activeColor[1], activeColor[2]]; // mark the point so that I know if I passed through it.
-
-  floodFillInner(x + 1, y, r, g, b); // then i can either go south
-  floodFillInner(x - 1, y, r, g, b); // or north
-  floodFillInner(x, y + 1, r, g, b); // or east
-  floodFillInner(x, y - 1, r, g, b); // or west
-}
-
 function submit() {
   let checkedValue = document.getElementById('input-checkbox').checked;
   let inputAuthor = document.getElementById('input-author').value;
@@ -220,17 +295,9 @@ function submit() {
   if (checkedValue == false) {
     print('Please accept the terms and conditions')
   }
-  if (checkedValue == true) {
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (user) {
-        var uid = firebase.auth().currentUser.uid;
-        console.log(uid);
-      } else {
-
-      }
-    });
-  }
+  if (checkedValue == true) {}
 }
+
 
 function hideModal() {
   var modal = document.getElementById('modal');
@@ -242,6 +309,5 @@ function hideModal() {
     document.getElementById('input-author').value = "";
     document.getElementById('input-id').value = "";
     document.getElementById('input-checkbox').checked = false;
-
   }
 }

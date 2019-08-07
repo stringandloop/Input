@@ -13,6 +13,7 @@ let plotsDrawn = [];
 
 let color1, color2, color3, color4, color5, color6, bg;
 
+
 function setup() {
 
   color1 = [201, 33, 33]; // red
@@ -27,8 +28,6 @@ function setup() {
   var path = database.ref('backers');
   imageMode(CENTER);
   makeImages();
-
-
 
   path.on('child_added', function(data) {
     // get the value of the current plot and updated pixels
@@ -68,6 +67,7 @@ function setup() {
   canvas.parent('preview');
   background(0);
 }
+
 
 function draw() {
   background(0);
@@ -109,6 +109,7 @@ function clearImage(plot) {
   }
 }
 
+
 function errData(err) {
   console.log('Read Error!');
   console.log(err);
@@ -131,8 +132,6 @@ function heelCheck(plot) {
   }
   return true;
 }
-
-
 
 
 function makeImages() {

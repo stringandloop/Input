@@ -1,42 +1,34 @@
 let sketch;
 let pixels = [];
-let compressedPixels = '';
-let visit = [];
-let count = 0;
+let compressedPixels;
 
+let rowLen = 28; // cells
+let colLen = 40; // cells
 
 let tool = 0;
 const myBrush = 0;
 const myLine = 1;
 const myFill = 2;
+let brushSize = 2;
 
 let dither = false;
 let mirrorX = false;
 let mirrorY = false;
 let showGrid = true;
+let preview = false;
 
+let modal = false;
+let cursor = true;
 
 let cellW, cellH;
 let startX, startY;
-
-let preview = false;
-
 let color1, color2, color3, color4, color5, color6, bg;
+let activeColor;
 
 let undoState = 0;
 let maxUndo = 100;
 let savedGrids = [];
-
-let rowLen = 28; // cells
-let colLen = 40; // cells
-
-let brushSize = 2;
-let activeColor;
-
-let filename;
-let modal = false;
-
-let cursor = true;
+let count = 0;
 
 
 function setup() {
@@ -47,12 +39,11 @@ function setup() {
   color4 = [120, 120, 120]; // grey
   color5 = [251, 190, 44]; // gold
   color6 = [0, 0, 0]; // black
-  bg = [0, 0, 0];
+  bg = [0, 0, 0]; //black
 
   swatches = [color1, color2, color3, color4, color5, color6];
   activeColor = color1;
 
-  noStroke();
   background(bg);
 
   sketch = document.getElementById('sketch-holder');
@@ -65,20 +56,23 @@ function setup() {
   loadSavedPixels();
   // Move the canvas so it’s inside our <div id="sketch-holder">.
   canvas.parent('sketch-holder');
-  gridImg = createGraphics(rowLen, colLen);
-
+  gridImg = createGraphics(rowLen * 7, colLen * 5);
 
   sketchListeners();
+  //remove placeholder padding when sketch is loaded
   select('#sketch-holder').style('padding-top: 0%;')
   createPalette();
   createUsername();
   brushButtons();
   controlButtons();
+  toolButtons();
+  modifierButtons();
   noLoop();
 }
 
+
 function draw() {
-  noStroke();
+  background(bg);
 
   let pushCursorX = 0;
   let pushCursorY = 0;
@@ -93,12 +87,8 @@ function draw() {
     pushCursorY = -.5 * cellH;
   }
 
-
-
   let cellX = (floor((mouseX + pushCursorX) / cellW));
   let cellY = (floor((mouseY + pushCursorY) / cellH));
-  //let cellX = floor(map(mouseX + pushCursorX, 0, cellW * rowLen, 0, rowLen));
-  //let cellY = floor(map(mouseY + pushCursorY, 0, cellH * colLen, 0, colLen));
 
   drawPixels();
 
@@ -150,25 +140,27 @@ function draw() {
       fill(200, 100);
     }
 
+
+
+
     placeCursor(cellX, cellY);
+
     if (mirrorX == true) {
-      placeCursor(rowLen - cellX, cellY);
+      placeCursor(rowLen - cellX, cellY, 'x');
     }
     if (mirrorY == true) {
-      placeCursor(cellX, colLen - cellY);
+      placeCursor(cellX, colLen - cellY, 'y');
     }
-    if (mirrorY == true && mirrorY == true) {
-      placeCursor(rowLen - cellX, colLen - cellY);
+    if (mirrorX == true && mirrorY == true) {
+      placeCursor(rowLen - cellX, colLen - cellY, 'x', 'y');
     }
 
   }
 
-  noStroke();
 
   drawGrid(showGrid);
 
-  // Invoiking loop results in smoother framerate than using redraw
-  // with mouse move.
+  // Invoiking loop results in smoother framerate than using redraw with mouse move.
   count++;
   if (count > 1) {
     noLoop();
@@ -183,10 +175,10 @@ function windowResized() {
   resizeCanvas(sketch.offsetWidth, cellW * .7 * colLen);
 }
 
+
 function canvasPressed() {
   saveGrid();
   redraw();
-
   pmouseX = mouseX;
   pmouseY = mouseY;
 
@@ -206,27 +198,24 @@ function canvasReleased() {
   startY = null;
   sendImage();
   localStorage.setItem("pixels", JSON.stringify(compress(pixels)));
+
   // redraw one more time since the canvas likes to freak out a bit
   // after everything before. draw one more time to smooth it out and settle
   // into the appearance once noLoop is invoked.
-
   redraw();
   noLoop();
 }
 
 
 function cursorMoved() {
-
   // update startX and startY after cursor movement for touch screens
   // mouseX and mouseY only update on the drawing cycle so the same method
   // used for mouse interactions with canvasPressed will not work.
-
   if (preview == false && tool == myLine) {
     startX = mouseX;
     startY = mouseY;
     preview = true;
   }
-
   count = 0;
   loop();
 }
@@ -237,6 +226,7 @@ function drawPixels() {
     for (let j = 0; j < colLen; j++) {
       let pixel = pixels[index(i, j)];
       fill(pixel[0], pixel[1], pixel[2]);
+      stroke(pixel[0], pixel[1], pixel[2]);
       rect(cellW * i, cellH * j, cellW, cellH);
     }
   }
@@ -250,44 +240,30 @@ function drawGrid(grid) {
     for (let i = 0; i <= rowLen; i++) {
       line(i * cellW, 0, i * cellW, height);
     }
-
     for (let i = 0; i <= colLen; i++) {
       line(0, i * cellH, width, i * cellH);
     }
-    //fill in edge with an extra line which goes off the canvas when inside the
-    //for loop
-    line(0, height - 1, width, height - 1);
     strokeWeight(2);
     stroke(60, 255, 255, 100);
     rect(cellW * 2, cellH * 3, width - cellW * 4, height - cellH * 6);
     strokeWeight(1);
-    noStroke();
   }
 }
-
-
 
 
 function loadSavedPixels() {
   for (let i = 0; i < rowLen * colLen; i++) {
     pixels[i] = [bg[0], bg[1], bg[2]];
   }
-
   if (localStorage.getItem("pixels")) {
     // if pixels exist in storage, retrieve and parse them
-    let storedPixels = JSON.parse(localStorage.getItem("pixels"));
-    // pass the condensed version over to the database
+    let storedPixels = localStorage.getItem("pixels");
+    // initialize condensedpixels with data from local storage
     compressedPixels = storedPixels;
     // expand the string and begin assigning values to the larger array
     storedPixels = decompress(storedPixels);
     if (storedPixels.length == pixels.length) {
-      for (let i = 0; i < pixels.length; i++) {
-        let r = decode(storedPixels.charAt(i))[0];
-        let g = decode(storedPixels.charAt(i))[1];
-        let b = decode(storedPixels.charAt(i))[2];
-        let pixelColor = [r, g, b];
-        pixels[i] = pixelColor;
-      }
+      updateLoadedPixels(storedPixels);
     }
   } else {
     //clear old data if it 's not compatible
@@ -296,13 +272,30 @@ function loadSavedPixels() {
   sendImage();
 }
 
-function cursorOn() {
-  cursor = true;
+// assign loaded
+function updateLoadedPixels(storedPixels) {
+    for (let i = 0; i < pixels.length; i++) {
+      let r = decode(storedPixels.charAt(i))[0];
+      let g = decode(storedPixels.charAt(i))[1];
+      let b = decode(storedPixels.charAt(i))[2];
+      let pixelColor = [r, g, b];
+      pixels[i] = pixelColor;
+    }
 }
+
+
+function cursorOn() {
+  // dont show cursor when using the fill tool
+  if (tool != 2) {
+    cursor = true;
+  }
+}
+
 
 function cursorOff() {
   cursor = false;
   noLoop();
+  redraw();
 }
 
 
@@ -312,27 +305,28 @@ function sketchListeners() {
     event.preventDefault()
     cursor = false;
   });
-
   /*mouseDragged is not an equivilent method for p5js, so use touchMoved
   to achiveve the same effect.
   */
-  select('#sketch-holder').touchMoved(cursorMoved); // Support touch devices
-  select('#sketch-holder').mouseMoved(cursorMoved);
+  select('#sketch-border').touchMoved(cursorMoved); // Support touch devices
+  select('#sketch-border').mouseMoved(cursorMoved);
 
   // Hides cursor when mouse is not on the canvas
-  select('#sketch-holder').mouseOver(cursorOn);
-  select('#sketch-holder').mouseOut(cursorOff);
-
-  select('#sketch-holder').touchStarted(canvasPressed); // Support touch devices
-  select('#sketch-holder').mousePressed(canvasPressed);
-
-  select('#sketch-holder').touchEnded(canvasReleased); // Support touch devices
-  select('#sketch-holder').mouseReleased(canvasReleased);
+  select('#sketch-border').mouseOver(cursorOn);
+  select('#sketch-border').mouseOut(cursorOff);
+  // Records line drawn on screen to pixel array and increases undo state
+  select('#sketch-border').touchStarted(canvasPressed); // Support touch devices
+  select('#sketch-border').mousePressed(canvasPressed);
+  // Ends recording line drawn on screen to pixel array
+  select('#sketch-border').touchEnded(canvasReleased); // Support touch devices
+  select('#sketch-border').mouseReleased(canvasReleased);
 }
+
 
 function index(x, y) {
   return (rowLen * y + x);
 }
+
 
 function gridCheck() {
   if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
@@ -340,19 +334,39 @@ function gridCheck() {
   }
 }
 
-function placeCursor(cellX, cellY) {
+
+function placeCursor(cellX, cellY, reflect1, reflect2) {
+  if (reflect1 != undefined) {
+    if (reflect2 == undefined) {
+      reflect2 = ' ';
+    }
+
+    if (reflect1.toLowerCase() == 'x' || reflect2.toLowerCase() == 'x') {
+      if (brushSize == 1 || brushSize == 4) {
+        cellX = cellX - 1;
+      }
+    }
+
+    if (reflect1.toLowerCase() == 'y' || reflect2.toLowerCase() == 'y') {
+      if (brushSize == 1) {
+        cellY = cellY - 1;
+      } else if (brushSize == 3) {
+        cellY = cellY + 1;
+      } else if (brushSize == 4) {
+        cellY = cellY - 2;
+      }
+    }
+  }
+
+  noStroke();
   if (brushSize == 1) {
     //fill(red(activeColor), green(activeColor), blue(activeColor), 150);
-    // rect(mouseX - cellW * .5, mouseY - cellH * .5, cellW, cellH);
     rect(cellX * cellW, cellY * cellH, cellW, cellH);
   } else if (brushSize == 2) {
-    // rect(mouseX - cellW * 1.5, mouseY - cellH * 1.5, cellW * 2, cellH * 2);
     rect((cellX - 1) * cellW, (cellY - 1) * cellH, cellW * 2, cellH * 2);
   } else if (brushSize == 3) {
-    // rect(mouseX - cellW * 1.5, mouseY - cellH * 1.5, cellW * 2, cellH * 2);
     rect((cellX - 1) * cellW, (cellY - 2) * cellH, cellW * 2, cellH * 3);
   } else if (brushSize == 4) {
-    //rect(mouseX - cellW * 1.5, mouseY - cellH * 1.5, cellW * 3, cellH * 4);
     rect((cellX - 1) * cellW, (cellY - 1) * cellH, cellW * 3, cellH * 4);
   }
 }
@@ -364,8 +378,8 @@ function createUsername() {
       // User is signed in.
       var email_id = firebase.auth().currentUser.email;
       var uid = firebase.auth().currentUser.uid;
-      //write(uid);
       select('#header').html('Logged In As: ' + str(email_id) + ' | ' + '<a href="./login.html" onclick="logout()">Logout</a>');
+      select('#load-button').style('opacity', '1');
     } else {
       select('#header').html('<a href="./login.html">Login</a>');
     }
@@ -376,22 +390,3 @@ function createUsername() {
 function logout() {
   firebase.auth().signOut();
 }
-
-
-// // IF user is logged in get their saved pixels and update their drawing to match
-// // what we have
-// var path = database.ref('backers/' + uid);
-// path.once('value', function(data) {
-//     // get the value of the current plot and updated pixels
-//     let storedPixels = decompress(data.val().pixels);
-//     print(storedPixels);
-//     if (storedPixels.length == pixels.length) {
-//       for (let i = 0; i < pixels.length; i++) {
-//         let r = decode(storedPixels.charAt(i))[0];
-//         let g = decode(storedPixels.charAt(i))[1];
-//         let b = decode(storedPixels.charAt(i))[2];
-//         let pixelColor = [r, g, b];
-//         pixels[i] = pixelColor;
-//       }
-//     }
-//   });

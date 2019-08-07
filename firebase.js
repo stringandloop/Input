@@ -1,44 +1,50 @@
 var database = firebase.database();
-
 var data = {}
 
-function read(uid) {
+
+function read(uid, request) {
   //Read data
   var path = database.ref('backers/' + str(uid));
-  path.orderByChild('plot').once('child_added', gotData, errData);
+  path.once('value', gotData, errData);
+
+  function gotData(data) {
+    console.log('Read Successful:');
+    if (request == 'plot') {
+      console.log(data.val().plot);
+      return (data.val().plot);
+    }
+    console.log(data.val());
+    return (data.val());
+  }
+
+  function errData(err) {
+    console.log('Read Error!');
+    console.log(err);
+  }
 }
 
-function gotData(data) {
-
-  console.log('Read Successful:');
-  console.log(data.val());
-}
-
-function errData(err) {
-  console.log('Read Error!');
-  console.log(err);
-}
 
 function write(uid) {
+  compressedPixels = compress(pixels);
+
   data = {
     pixels: compressedPixels,
-    h: colLen,
-    w: rowLen,
-    t: new Date().toGMTString()
+    height: colLen,
+    width: rowLen,
+    timestamp: new Date().toGMTString(),
   }
-//Write data
 
-var path = database.ref('backers/' + str(uid));
+  var path = database.ref('backers/' + str(uid));
 
-path.update(data, finished);
-}
+  path.update(data, finished);
 
-function finished(err) {
-  if (err) {
-    alert('Write Error!');
-    console.log(err);
-  } else {
-    alert('Write Successful:');
-    console.log(data);
+  function finished(err) {
+    if (err) {
+      alert('Write Error!');
+      console.log(err);
+    } else {
+      alert('Write Successful:');
+      console.log('Wrote to server: ', data);
+    }
   }
 }
