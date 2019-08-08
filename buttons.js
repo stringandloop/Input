@@ -243,6 +243,7 @@ function createPalette() {
         select('#swatch6').html('');
 
         select('#' + str(name)).html('<div class="active-color"></div');
+        activeColor = color;
       }
     }
   }
