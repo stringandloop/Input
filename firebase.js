@@ -45,6 +45,7 @@ function write(uid) {
     } else {
       alert('Write Successful:');
       console.log('Wrote to server: ', data);
+      save(gridImg, 'stringandloop-input.png');
     }
   }
 }

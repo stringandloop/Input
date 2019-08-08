@@ -66,7 +66,6 @@ function setup() {
   brushButtons();
   controlButtons();
   toolButtons();
-  modifierButtons();
   noLoop();
 }
 

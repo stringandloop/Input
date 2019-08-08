@@ -40,11 +40,14 @@
   </div>
   <div id="left-side">
     <div class='control-holder' id="menu-holder">
-      <a id="undo-button" class='menu-button'>↩️&#8201;Undo</a>
-      <a id="clear-button" class='menu-button'>❌&#8201;Clear</a>
-      <a id="grid-button" class='menu-button'>🌐&#8201;Grid</a>
-      <a id="load-button" class='menu-button'>☁️&#8201;Load</a>
-      <a id="save-button" class='menu-button'>💾&#8201;Save</a>
+      <div id="undo-clear-grid">
+        <button id="undo-button" class='menu-button' title="Undo">Undo</button>
+        <button id="clear-button" class='menu-button' title="Clear canvas">Clear</button>
+        <button id="grid-button" class='menu-button' title="Hide grid">Hide Grid</button>
+      </div>
+      <div id="load-save">
+        <button id="load-button" class='menu-button' title="Load last saved drawing">Load</button><button id="save-button" class='menu-button' title="Save drawing">Save</button>
+      </div>
     </div>
     <div id="sketch-border">
       <div id="sketch-holder">
@@ -52,25 +55,30 @@
       </div>
     </div>
     <div class="control-holder" id="swatch-holder">
-        <a id="swatch1" class="swatch"></a>
-        <a id="swatch2" class="swatch"></a>
-        <a id="swatch3" class="swatch"></a>
-        <a id="swatch4" class="swatch"></a>
-        <a id="swatch5" class="swatch"></a>
-        <a id="swatch6" class="swatch"></a>
-        <a id="brush1" class="brush-size">1️⃣</a>
-        <a id="brush2" class="brush-size">️2️⃣</a>
-        <a id="brush3" class="brush-size">3️⃣</a>
-        <a id="brush4" class="brush-size">4️⃣</a>
-  </div>
-  <br>
+      <div id="swatches">
+        <a><span id="swatch1" class="swatch"></span></a>
+        <a><span id="swatch2" class="swatch"></span></a>
+        <a><span id="swatch3" class="swatch"></span></a>
+        <a><span id="swatch4" class="swatch"></span></a>
+        <a><span id="swatch5" class="swatch"></span></a>
+        <a><span id="swatch6" class="swatch"></span></a>
+      </div>
+      <div id="brushes">
+        <a><span id="brush1" class="brush"></span></a>
+        <a><span id="brush2" class="brush"></span></a>
+        <a><span id="brush3" class="brush"></span></a>
+        <a><span id="brush4" class="brush"></span></a>
+      </div>
+    </div>
+    <br>
     <div class='control-holder' id='tool-holder'>
-      <a id="pencil-button" class='tool'>✏️&#8201;Pencil</a>
-      <a id="line-button" class='tool'>📏&#8201;Line</a>
-      <a id="fill-button" class='tool'>🚰&#8201;Fill</a>
-      <a id="dither-button" class='modifier'>🏁&#8201;Dither</a>
-      <a id="mirrorx-button" class='modifier'>👯&#8201;MirrorX</a>
-      <a id="mirrory-button" class='modifier'>🙃&#8201;MirrorY</a>
+      <a id="pencil-button" class='tool'>Pencil</a>
+      <a id="line-button" class='tool'>Line</a>
+      <a id="fill-button" class='tool'>Fill</a>
+      |
+      <a id="dither-button" class='modifier'>Dither</a>
+      <a id="mirrorx-button" class='modifier'>MirrorX</a>
+      <a id="mirrory-button" class='modifier'>MirrorY</a>
     </div>
   </div>
   <div id="right-side">
