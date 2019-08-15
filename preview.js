@@ -29,6 +29,13 @@ function setup() {
   imageMode(CENTER);
   makeImages();
 
+
+  sketch = document.getElementById('preview-holder');
+  let canvas = createCanvas(sketch.offsetWidth, sketch.offsetWidth * 2);
+
+  canvas.parent('preview');
+  background(0);
+
   path.on('child_added', function(data) {
     // get the value of the current plot and updated pixels
     let pixels = data.val().pixels;
@@ -61,11 +68,6 @@ function setup() {
       redraw();
     }
   });
-
-
-  let canvas = createCanvas(300, 600);
-  canvas.parent('preview');
-  background(0);
 }
 
 
@@ -133,6 +135,10 @@ function heelCheck(plot) {
   return true;
 }
 
+function windowResized() {
+sketch = document.getElementById('preview-holder')
+resizeCanvas(sketch.offsetWidth, sketch.offsetWidth*2);
+}
 
 function makeImages() {
   p0 = createGraphics(rowLen * 7, colLen * 5);
