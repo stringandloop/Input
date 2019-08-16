@@ -2,17 +2,13 @@ var database = firebase.database();
 var data = {}
 
 
-function read(uid, request) {
+function read(uid) {
   //Read data
   var path = database.ref('backers/' + str(uid));
   path.once('value', gotData, errData);
 
   function gotData(data) {
     console.log('Read Successful:');
-    if (request == 'plot') {
-      console.log(data.val().plot);
-      return (data.val().plot);
-    }
     console.log(data.val());
     return (data.val());
   }
@@ -26,12 +22,18 @@ function read(uid, request) {
 
 function write(uid) {
   compressedPixels = compress(pixels);
+  let plot = read(uid);
+  console.log(plot);
+  if (plot == null) {
+    plot = -1;
+  }
 
   data = {
     pixels: compressedPixels,
     height: colLen,
     width: rowLen,
     timestamp: new Date().toGMTString(),
+    plot: plot,
   }
 
   var path = database.ref('backers/' + str(uid));

@@ -377,10 +377,10 @@ function createUsername() {
       // User is signed in.
       var email_id = firebase.auth().currentUser.email;
       var uid = firebase.auth().currentUser.uid;
-      select('#header').html('Logged In As: ' + str(email_id) + ' | ' + '<a href="./login.html" onclick="logout()">Logout</a>');
+      select('#header').html('Logged In As: ' + str(email_id) + ' | ' + '<a href="./preview.html" onclick="logout()">Logout</a>');
       select('#load-button').style('opacity', '1');
     } else {
-      select('#header').html('<a href="./login.html">Login</a>');
+      select('#header').html('<a href="./preview.html">Login</a>');
     }
   });
 }

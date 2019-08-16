@@ -37,17 +37,19 @@ function setup() {
   background(0);
 
   path.on('child_added', function(data) {
-    // get the value of the current plot and updated pixels
-    let pixels = data.val().pixels;
-    pixels = decompress(pixels);
-    let plot = data.val().plot;
-    // validate pixels and plot location
-    if (pixels && plot > -1 && heelCheck(plot) == true && plot < 60) {
-      // store the value of the plot and pixels that have been drawn in a dictionary
-      plotsDrawn[data.key] = plot;
-      //draw the new image
-      drawImage(plot, pixels);
-      redraw();
+    if (data.val().pixels != null) {
+      // get the value of the current plot and updated pixels
+      let pixels = data.val().pixels;
+      pixels = decompress(pixels);
+      let plot = data.val().plot;
+      // validate pixels and plot location
+      if (pixels && plot > -1 && plot < 60 && heelCheck(plot) == true) {
+        // store the value of the plot and pixels that have been drawn in a dictionary
+        plotsDrawn[data.key] = plot;
+        //draw the new image
+        drawImage(plot, pixels);
+        redraw();
+      }
     }
   });
 
@@ -57,10 +59,12 @@ function setup() {
     pixels = decompress(pixels);
     let plot = data.val().plot;
     // validate pixels and plot location
-    if (pixels && plot > -1 && heelCheck(plot) == true && plot < 60) {
-      // reset the plot that was drawn previously
-      clearImage(plotsDrawn[data.key]);
-      // update the record with the plot that the user now owns
+    if (pixels && plot > -1 && plot < 60 && heelCheck(plot) == true) {
+      // reset the plot that was drawn previously, if there is one.
+      if (plotsDrawn[data.key] || plotsDrawn[data.key] == 0) {
+        clearImage(plotsDrawn[data.key]);
+        // update the record with the plot that the user now owns
+      }
       plotsDrawn[data.key] = plot;
       //draw the new image
 
@@ -83,6 +87,7 @@ function draw() {
 }
 
 
+
 function drawImage(plot, pixels) {
   for (let i = 0; i < rowLen; i++) {
     for (let j = 0; j < colLen; j++) {
@@ -102,7 +107,7 @@ function clearImage(plot) {
   previewArray[plot].fill(255);
   previewArray[plot].textSize(32);
 
-  if (plot == 30 || plot == 31 || plot == 34 || plot == 35) {
+  if (heelCheck(plot) == false) {
     previewArray[plot].fill(255, 0, 0);
     previewArray[plot].text('Heel', previewArray[plot].width / 2, previewArray[plot].height / 2 + 16);
     previewArray[plot].fill(255);
@@ -118,15 +123,11 @@ function errData(err) {
 }
 
 
+
 function index(x, y) {
   return (rowLen * y + x);
 }
 
-
-function windowResized() {
-  sketch = document.getElementById('preview')
-  //resizeCanvas(200, 400);
-}
 
 function heelCheck(plot) {
   if (plot == 30 || plot == 31 || plot == 34 || plot == 35) {
@@ -136,8 +137,8 @@ function heelCheck(plot) {
 }
 
 function windowResized() {
-sketch = document.getElementById('preview-holder')
-resizeCanvas(sketch.offsetWidth, sketch.offsetWidth*2);
+  sketch = document.getElementById('preview-holder')
+  resizeCanvas(sketch.offsetWidth, sketch.offsetWidth * 2);
 }
 
 function makeImages() {

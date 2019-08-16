@@ -5,11 +5,13 @@ body {
   max-width: 720px;
   display: block;
   margin: auto;
-  position: relative
+  position: relative;
+  font-family: 'Source Sans Pro', sans-serif;
 }
 
 #container {
   display: flex;
+  position: relative;
 }
 
 #preview-holder {
@@ -18,29 +20,28 @@ body {
   background-size: 22px;
   padding-top: 22px;
   width: 80%;
+  /* Max width 316 pervents odd number widths rounding the preview holder 1px
+  larger than the canvas */
+  max-width: 316px;
   margin: auto;
   border-radius: 5px;
   box-shadow: 0px 15px 30px rgba(0, 0, 0, .4) !important;
 }
 
 #preview {
-  width: fit-content;
-  height: auto;
   background-color: white;
-  height: auto !important;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
   position: relative;
-  background-repeat: repeat-x;
-  background-size: 22px;
   display: block;
+  background-color: red;
 }
 
 #left-side {
   width: 55%;
   font-family: 'Source Code Pro', monospace;
   color: black;
-  padding-bottom: 30px;
+  padding-bottom: 40px;
   display: inline-block;
 }
 
@@ -71,7 +72,7 @@ h3 {
   font-size: 22px;
 }
 
-.main-div, .loggedin-div {
+.main-div, .user_div, .loggedin-div {
   max-width: 250px;
   min-width: 200px;
   margin: auto;
@@ -83,7 +84,7 @@ h3 {
   top: 0px;
 }
 
-.main-div input {
+input {
   display: block;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -97,7 +98,7 @@ h3 {
   -moz-transition: 0.3s;
 }
 
-.main-div input:focus {
+input:focus {
   border: 1px solid #777;
 }
 
@@ -131,7 +132,7 @@ h3 {
     display: block;
   }
 
-  .main-div {
+  .main-div, .loggedin-div {
     padding-left: 12%;
   }
 

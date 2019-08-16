@@ -78,6 +78,7 @@ function controlButtons() {
   }
 
   function loadButton() {
+    saveGrid();
     firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
         var uid = firebase.auth().currentUser.uid;
@@ -89,12 +90,7 @@ function controlButtons() {
           let storedPixels = decompress(data.val().pixels);
           if (storedPixels.length == pixels.length) {
             updateLoadedPixels(storedPixels);
-            redraw();
-            sendImage();
             alert('Successfully loaded data loaded from Server')
-            //Save the action so that it may be undone
-            saveGrid();
-            //release the canvas from drawing to debug the alert box counting as a mouse press
             canvasReleased();
             return;
           }
@@ -121,8 +117,6 @@ function controlButtons() {
       if (user) {
         var uid = firebase.auth().currentUser.uid;
         write(uid);
-        saveGrid();
-        canvasReleased();
       } else {
         alert('Thank you for your submission!');
         save(gridImg, 'stringandloop-input.png');

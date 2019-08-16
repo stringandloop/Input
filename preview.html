@@ -47,24 +47,28 @@
       </div>
     </div>
 
-  <div id="right-side">
-    <div id="login_div" class="main-div">
-      <h3>string&&loop Input</h3>
-      <!-- <form autocomplete="on"> -->
-      <input type="email" placeholder="Email..." id="email_field" autocomplete="on" />
-      <input type="password" placeholder="Password..." id="password_field" autocomplete="on" onclick="enter(password_field)" />
-      <!-- </form> -->
+    <div id="right-side">
+      <div id="login_div" class="main-div">
+        <h3>string&&loop Input</h3>
+        <!-- <form autocomplete="on"> -->
+        <input type="email" placeholder="Email..." id="email_field" autocomplete="on" />
+        <input type="password" placeholder="Password..." id="password_field" autocomplete="on" />
+        <!-- </form> -->
+        <a class="button" id="login-button" onclick="login()">Login</a>
+      </div>
+      <div id="user_div" class="loggedin-div">
+        <h3>Welcome!</h3>
+        <p id="user_para">You're currently logged in.</p>
+        <a class="button" onclick="logout()">Logout</a>
+        <p id="plot_para">Loading plot...</p>
+        <input type="text" placeholder="Plot" id="plot_field"/>
+        <a class="button" id="plot-button" onclick="plotUpdate()">Assign Plot</a>
+      </div>
 
-      <a class="button" id="login-button" onclick="login()">Login</a>
-    </div>
-
-    <div id="user_div" class="loggedin-div">
-      <h3>Welcome!</h3>
-      <p id="user_para">You're currently logged in.</p>
-      <a class="button" onclick="logout()">Logout</a>
+      <!-- Make enter key automaticlly login -->
+      <script src="keybind.js"></script>
     </div>
   </div>
-</div>
 </body>
 
 </html>
