@@ -1,12 +1,19 @@
 /* canvas {
   border: 5px solid black;
 } */
+
 body {
   max-width: 720px;
   display: block;
   margin: auto;
   position: relative;
   font-family: 'Source Sans Pro', sans-serif;
+}
+
+#header {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  display: block;
 }
 
 #container {
@@ -45,100 +52,95 @@ body {
   display: inline-block;
 }
 
-#right-side {
-  width: 45%;
-  margin: auto;
-}
-
-canvas {
-  border-bottom-right-radius: 5px;
-  border-bottom-left-radius: 5px;
-}
-
-input {
-  font-family: 'Source Sans Pro', monospace;
-  font-weight: 500;
-  font-size: 14px;
-}
-
-.button {
-  font-family: 'Source Code Pro', monospace;
-  font-weight: 600;
-}
-
-h3 {
-  font-weight: 500;
-  text-align: center;
-  font-size: 22px;
-}
-
-.main-div, .user_div, .loggedin-div {
-  max-width: 250px;
-  min-width: 200px;
-  margin: auto;
-  padding-top: 75px;
-  padding-bottom: 75px;
-  padding-right: 12%;
-  display: none;
-  position: relative;
-  top: 0px;
-}
-
-input {
+#reset-password {
+  color: grey;
+  padding: 3%;
   display: block;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background: #fff;
-  padding: 15px;
-  outline: none;
-  width: 100%;
-  margin-bottom: 20px;
-  transition: 0.3s;
-  -webkit-transition: 0.3s;
-  -moz-transition: 0.3s;
-}
-
-input:focus {
-  border: 1px solid #777;
-}
-
-.button {
+  width: 94%;
   text-align: center;
-  background: #e73848;
-  color: #fff;
-  border: 1px solid #e73848;
-  border-radius: 5px;
-  padding: 15px;
-  display: block;
-  transition: 0.3s;
-  -webkit-transition: 0.3s;
-  -moz-transition: 0.3s;
 }
 
-.button:hover {
-  background: #fff;
-  color: #e73848;
-  border: 1px solid #e73848;
-  cursor: pointer;
-}
-
-@media only screen and (max-width: 600px) {
-  #container {
-    flex-direction: column-reverse;
+ #right-side {
+    width: 45%;
+    margin: auto;
   }
-
-  #left-side {
-    width: 100%;
+  canvas {
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+  }
+  input {
+    font-family: 'Source Sans Pro', monospace;
+    font-weight: 500;
+    font-size: 14px;
+  }
+  .button {
+    font-family: 'Source Code Pro', monospace;
+    font-weight: 600;
+  }
+  h3 {
+    font-weight: 500;
+    text-align: center;
+    font-size: 22px;
+  }
+  .main-div, .user_div, .loggedin-div {
+    max-width: 250px;
+    min-width: 200px;
+    margin: auto;
+    padding-top: 75px;
+    padding-bottom: 75px;
+    padding-right: 12%;
+    display: none;
+    position: relative;
+    top: 0px;
+  }
+  input {
     display: block;
-  }
-
-  .main-div, .loggedin-div {
-    padding-left: 12%;
-  }
-
-  #right-side {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #fff;
+    padding: 15px;
+    outline: none;
     width: 100%;
-    display: block;
-    float: left;
+    margin-bottom: 20px;
+    transition: 0.3s;
+    -webkit-transition: 0.3s;
+    -moz-transition: 0.3s;
   }
-}
+  input:focus {
+    border: 1px solid #777;
+  }
+  .button {
+    text-align: center;
+    background: #e73848;
+    color: #fff;
+    border: 1px solid #e73848;
+    border-radius: 5px;
+    padding: 15px;
+    display: block;
+    transition: 0.3s;
+    -webkit-transition: 0.3s;
+    -moz-transition: 0.3s;
+  }
+  .button:hover {
+    background: #fff;
+    color: #e73848;
+    border: 1px solid #e73848;
+    cursor: pointer;
+  }
+  @media only screen and (max-width: 600px) {
+    #container {
+      flex-direction: column-reverse;
+    }
+    #left-side {
+      width: 100%;
+      display: block;
+    }
+    .main-div, .loggedin-div {
+      padding-left: 12%;
+    }
+    #right-side {
+      width: 100%;
+      display: block;
+      float: left;
+    }
+  }

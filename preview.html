@@ -26,7 +26,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="buttons.js"></script>
   <script src="tools.js"></script>
-  <script src="login.js"></script>
   <script src="encoding.js"></script>
   <script src="preview.js"></script>
   <link rel="stylesheet" href="preview.css">
@@ -34,8 +33,9 @@
 </head>
 
 <body>
-
-
+  <div id="header">
+    <p id="user_para"><br></p>
+  </div>
   <div id="container">
     <div id="left-side">
 
@@ -55,11 +55,10 @@
         <input type="password" placeholder="Password..." id="password_field" autocomplete="on" />
         <!-- </form> -->
         <a class="button" id="login-button" onclick="login()">Login</a>
+        <a id="reset-password" onclick="reset()">(Forgot Password)</a>
       </div>
       <div id="user_div" class="loggedin-div">
-        <h3>Welcome!</h3>
-        <p id="user_para">You're currently logged in.</p>
-        <a class="button" onclick="logout()">Logout</a>
+
         <p id="plot_para">Loading plot...</p>
         <input type="text" placeholder="Plot" id="plot_field"/>
         <a class="button" id="plot-button" onclick="plotUpdate()">Assign Plot</a>
@@ -67,6 +66,8 @@
 
       <!-- Make enter key automaticlly login -->
       <script src="keybind.js"></script>
+      <!-- Move this script until after page is loaded so that all dynamic elements exist -->
+      <script src="login.js"></script>
     </div>
   </div>
 </body>

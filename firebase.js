@@ -22,18 +22,12 @@ function read(uid) {
 
 function write(uid) {
   compressedPixels = compress(pixels);
-  let plot = read(uid);
-  console.log(plot);
-  if (plot == null) {
-    plot = -1;
-  }
 
   data = {
     pixels: compressedPixels,
     height: colLen,
     width: rowLen,
     timestamp: new Date().toGMTString(),
-    plot: plot,
   }
 
   var path = database.ref('backers/' + str(uid));

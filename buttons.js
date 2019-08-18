@@ -33,7 +33,6 @@ function controlButtons() {
   select('#load-button').mousePressed(loadButton);
   select('#save-button').mousePressed(saveButton);
 
-
   function undoButton() {
     if (undoState > 0) {
       undoState = undoState - 1;
@@ -79,29 +78,29 @@ function controlButtons() {
 
   function loadButton() {
     saveGrid();
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (user) {
-        var uid = firebase.auth().currentUser.uid;
-        var path = database.ref('backers/' + uid);
-        path.once('value', gotData, errData);
+    var user = firebase.auth().currentUser;
 
-        function gotData(data) {
-          // get the value of the current plot and updated pixels
-          let storedPixels = decompress(data.val().pixels);
-          if (storedPixels.length == pixels.length) {
-            updateLoadedPixels(storedPixels);
-            alert('Successfully loaded data loaded from Server')
-            canvasReleased();
-            return;
-          }
-          alert('Sorry, your saved data is incompatible with the current canvas.')
-        }
+    if (user) {
+      var uid = firebase.auth().currentUser.uid;
+      var path = database.ref('backers/' + uid);
+      path.once('value', gotData, errData);
 
-        function errData(data) {
-          alert('Sorry. Something went wrong. Could Not read data from server.')
+      function gotData(data) {
+        // get the value of the current plot and updated pixels
+        let storedPixels = decompress(data.val().pixels);
+        if (storedPixels.length == pixels.length) {
+          updateLoadedPixels(storedPixels);
+          alert('Successfully loaded data loaded from Server')
+          canvasReleased();
+          return;
         }
+        alert('Sorry, your saved data is incompatible with the current canvas.')
       }
-    });
+
+      function errData(data) {
+        alert('Sorry. Something went wrong. Could Not read data from server.')
+      }
+    }
   }
 
   function saveButton() {
@@ -113,17 +112,19 @@ function controlButtons() {
         gridImg.rect(i * 7, j * 5, 7, 5);
       }
     }
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (user) {
-        var uid = firebase.auth().currentUser.uid;
-        write(uid);
-      } else {
-        alert('Thank you for your submission!');
-        save(gridImg, 'stringandloop-input.png');
-      }
-    });
+
+    var user = firebase.auth().currentUser;
+
+    if (user) {
+      var uid = firebase.auth().currentUser.uid;
+      write(uid);
+    } else {
+      alert('Thank you for your submission!');
+      save(gridImg, 'stringandloop-input.png');
+    }
   }
 }
+
 
 function toolButtons() {
   select('#pencil-button').mousePressed(pencilButton);
@@ -213,101 +214,101 @@ function createPalette() {
   select('#swatch1').html('<div class="active-color"></div');
 
 
-    function createSwatch(element, name, color) {
-      element = select('#' + str(name))
-      element.style('background-color', 'rgb(' + color[0] + ', ' + color[1] + ', ' + color[2] + ')');
-      let darker;
-      if ((color[0] + color[1] + color[2]) / 3 > 80) {
-        darker = str('rgb(' + (color[0] - 20) + ', ' + (color[1] - 20) + ', ' + (color[2] - 20) + ')');
-      } else {
-        darker = str('rgb(' + (color[0] + 60) + ', ' + (color[1] + 60) + ', ' + (color[2] + 60) + ')');
-      }
-      element.style('box-shadow', '0 0 0 2px ' + darker);
-      element.mousePressed(swatchButton(color, name));
+  function createSwatch(element, name, color) {
+    element = select('#' + str(name))
+    element.style('background-color', 'rgb(' + color[0] + ', ' + color[1] + ', ' + color[2] + ')');
+    let darker;
+    if ((color[0] + color[1] + color[2]) / 3 > 80) {
+      darker = str('rgb(' + (color[0] - 20) + ', ' + (color[1] - 20) + ', ' + (color[2] - 20) + ')');
+    } else {
+      darker = str('rgb(' + (color[0] + 60) + ', ' + (color[1] + 60) + ', ' + (color[2] + 60) + ')');
     }
-
-
-    function swatchButton(color, name) {
-      return function() {
-        select('#swatch1').html('');
-        select('#swatch2').html('');
-        select('#swatch3').html('');
-        select('#swatch4').html('');
-        select('#swatch5').html('');
-        select('#swatch6').html('');
-
-        select('#' + str(name)).html('<div class="active-color"></div');
-        activeColor = color;
-      }
-    }
+    element.style('box-shadow', '0 0 0 2px ' + darker);
+    element.mousePressed(swatchButton(color, name));
   }
 
 
-  function brushButtons() {
-    select('#brush1').mousePressed(brush1);
-    select('#brush2').mousePressed(brush2);
-    select('#brush3').mousePressed(brush3);
-    select('#brush4').mousePressed(brush4);
+  function swatchButton(color, name) {
+    return function() {
+      select('#swatch1').html('');
+      select('#swatch2').html('');
+      select('#swatch3').html('');
+      select('#swatch4').html('');
+      select('#swatch5').html('');
+      select('#swatch6').html('');
 
-    function resetBrushes() {
-      select('#brush1').html('1️⃣');
-      select('#brush2').html('2️⃣')
-      select('#brush3').html('3️⃣')
-      select('#brush4').html('4️⃣')
-    }
-
-    function brush1() {
-      brushSize = 1;
-      //resetBrushes();
-      //  select('#brush1').html('*️⃣');
-    }
-
-    function brush2() {
-      brushSize = 2;
-      //resetBrushes();
-      //select('#brush2').html('*️⃣');
-    }
-
-    function brush3() {
-      brushSize = 3;
-      //resetBrushes();
-      //select('#brush3').html('*️⃣');
-    }
-
-    function brush4() {
-      brushSize = 4;
-      //resetBrushes();
-      //select('#brush4').html('*️⃣');
+      select('#' + str(name)).html('<div class="active-color"></div');
+      activeColor = color;
     }
   }
+}
 
 
-  function submit() {
-    let checkedValue = document.getElementById('input-checkbox').checked;
-    let inputAuthor = document.getElementById('input-author').value;
-    let inputID = document.getElementById('input-id').value;
+function brushButtons() {
+  select('#brush1').mousePressed(brush1);
+  select('#brush2').mousePressed(brush2);
+  select('#brush3').mousePressed(brush3);
+  select('#brush4').mousePressed(brush4);
 
-    print(checkedValue, inputAuthor, inputID);
-    let filename = 'stringandloop-input.png';
-    if (inputAuthor.length > 0) {
-      filename = inputAuthor + '-' + filename;
-    }
-    if (checkedValue == false) {
-      print('Please accept the terms and conditions')
-    }
-    if (checkedValue == true) {}
+  function resetBrushes() {
+    select('#brush1').html('1️⃣');
+    select('#brush2').html('2️⃣')
+    select('#brush3').html('3️⃣')
+    select('#brush4').html('4️⃣')
   }
 
-
-  function hideModal() {
-    var modal = document.getElementById('modal');
-
-    if (event.target == modal) {
-      select('#modal').style('display: none;');
-      select('#modal').style('opacity: 0;');
-      // Clear modal values
-      document.getElementById('input-author').value = "";
-      document.getElementById('input-id').value = "";
-      document.getElementById('input-checkbox').checked = false;
-    }
+  function brush1() {
+    brushSize = 1;
+    //resetBrushes();
+    //  select('#brush1').html('*️⃣');
   }
+
+  function brush2() {
+    brushSize = 2;
+    //resetBrushes();
+    //select('#brush2').html('*️⃣');
+  }
+
+  function brush3() {
+    brushSize = 3;
+    //resetBrushes();
+    //select('#brush3').html('*️⃣');
+  }
+
+  function brush4() {
+    brushSize = 4;
+    //resetBrushes();
+    //select('#brush4').html('*️⃣');
+  }
+}
+
+
+function submit() {
+  let checkedValue = document.getElementById('input-checkbox').checked;
+  let inputAuthor = document.getElementById('input-author').value;
+  let inputID = document.getElementById('input-id').value;
+
+  print(checkedValue, inputAuthor, inputID);
+  let filename = 'stringandloop-input.png';
+  if (inputAuthor.length > 0) {
+    filename = inputAuthor + '-' + filename;
+  }
+  if (checkedValue == false) {
+    print('Please accept the terms and conditions')
+  }
+  if (checkedValue == true) {}
+}
+
+
+function hideModal() {
+  var modal = document.getElementById('modal');
+
+  if (event.target == modal) {
+    select('#modal').style('display: none;');
+    select('#modal').style('opacity: 0;');
+    // Clear modal values
+    document.getElementById('input-author').value = "";
+    document.getElementById('input-id').value = "";
+    document.getElementById('input-checkbox').checked = false;
+  }
+}

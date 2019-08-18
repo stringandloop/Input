@@ -53,6 +53,7 @@ function setup() {
     }
   });
 
+
   path.on('child_changed', function(data) {
     // get the value of the current plot and updated pixels
     let pixels = data.val().pixels;
@@ -60,14 +61,15 @@ function setup() {
     let plot = data.val().plot;
     // validate pixels and plot location
     if (pixels && plot > -1 && plot < 60 && heelCheck(plot) == true) {
-      // reset the plot that was drawn previously, if there is one.
+      // reset the plot's drawing data, if there was one.
       if (plotsDrawn[data.key] || plotsDrawn[data.key] == 0) {
         clearImage(plotsDrawn[data.key]);
-        // update the record with the plot that the user now owns
       }
-      plotsDrawn[data.key] = plot;
-      //draw the new image
 
+      // update the record with the plot that the user now owns
+      plotsDrawn[data.key] = plot;
+
+      //draw the new image
       drawImage(plot, pixels);
       redraw();
     }
@@ -85,7 +87,6 @@ function draw() {
   }
   noLoop();
 }
-
 
 
 function drawImage(plot, pixels) {

@@ -20,6 +20,10 @@ let preview = false;
 let modal = false;
 let cursor = true;
 
+// a custom mouseIsPressed boolean for keeping track of mouseIsPressed only
+// on the canvas.
+let toolIsActive = false;
+
 let cellW, cellH;
 let startX, startY;
 let color1, color2, color3, color4, color5, color6, bg;
@@ -91,7 +95,7 @@ function draw() {
 
   drawPixels();
 
-  if (mouseIsPressed && gridCheck()) {
+  if (toolIsActive && gridCheck()) {
 
     if (tool == myBrush) {
       brushTool(cellX, cellY, pushCursorX, pushCursorY);
@@ -176,12 +180,14 @@ function windowResized() {
 
 
 function canvasPressed() {
+  toolIsActive = true;
+
   saveGrid();
   redraw();
   pmouseX = mouseX;
   pmouseY = mouseY;
 
-  if (mouseIsPressed && tool == myLine) {
+  if (toolIsActive && tool == myLine) {
     preview = true;
     startX = mouseX;
     startY = mouseY;
@@ -197,12 +203,12 @@ function canvasReleased() {
   startY = null;
   sendImage();
   localStorage.setItem("pixels", JSON.stringify(compress(pixels)));
-
   // redraw one more time since the canvas likes to freak out a bit
   // after everything before. draw one more time to smooth it out and settle
   // into the appearance once noLoop is invoked.
   redraw();
   noLoop();
+  toolIsActive = false;
 }
 
 
